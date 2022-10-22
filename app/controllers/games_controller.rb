@@ -6,6 +6,7 @@ class GamesController < ApplicationController
 
   def create
     game = Game.new
+    game.archived = false
     game.user = current_user
     game.turn = current_user
     if game.save
