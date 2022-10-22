@@ -1,8 +1,11 @@
 Rails.application.routes.draw do
   devise_for :users
   root to: "pages#home"
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  resources :games, only: [:index, :create, :update] do
+    resources :armies, only: [:create]
+  end
 
-  # Defines the root path route ("/")
-  # root "articles#index"
+  resources :armies do
+    resources :soldiers, only: [:update]
+  end
 end
