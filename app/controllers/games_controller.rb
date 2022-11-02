@@ -1,7 +1,8 @@
 class GamesController < ApplicationController
   before_action :set_game, only: [:update, :next_next]
   def index
-    @games = Games.where(user: current_user)
+    @game = Game.new
+    @games = Game.where(user: current_user).includes(:user, :winner)
   end
 
   def create

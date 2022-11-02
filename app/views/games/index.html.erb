@@ -1,2 +1,17 @@
-<h1>Games#index</h1>
-<p>Find me in app/views/games/index.html.erb</p>
+<div class="container">
+  <h1 class="text-center my-5">The current games</h1>
+  <%= simple_form_for @game do |f| %>
+    <%= f.button :submit, "Start a new game", class: "btn btn-primary" %>
+  <% end %>
+  
+  <div class="row">
+    <% @games.each do |game| %>
+      <div class="col-4">
+        <%= link_to game_path(game) do  %>
+          <p><%= game.winner.nil? ? "On going" : "Winner: #{game.winner}" %></p>
+          <p>Made by: <%= game.user.email %></p>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
