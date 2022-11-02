@@ -6,13 +6,14 @@ class GamesController < ApplicationController
   end
 
   def create
-    game = Game.new
-    game.archived = false
-    game.user = current_user
-    game.turn = current_user
-    if game.save
-      redirect_to game_path(game)
+    @game = Game.new
+    @game.archived = false
+    @game.user = current_user
+    @game.turn = current_user
+    if @game.save
+      redirect_to game_path(@game)
     else
+      @games = Game.where(user: current_user).includes(:user, :winner)
       render 'index'
     end
   end
