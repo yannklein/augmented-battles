@@ -1,0 +1,7 @@
+<%= link_to game_path(game), class: "text-decoration-none text-black" do  %>
+  <div class="border rounded shadow p-3 bg-white">
+    <h2>Battle #<%= game.id %></h2>
+    <p><%= game.winner.nil? ? "On going" : "Winner: #{game.winner}" %></p>
+    <p>Made by: <%= game.user.email %></p>
+  </div>
+<% end %>

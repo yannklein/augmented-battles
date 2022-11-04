@@ -4,13 +4,10 @@
     <%= f.button :submit, "Start a new game", class: "btn btn-primary" %>
   <% end %>
   
-  <div class="row">
+  <div class="row gap-3 py-3">
     <% @games.each do |game| %>
       <div class="col-4">
-        <%= link_to game_path(game) do  %>
-          <p><%= game.winner.nil? ? "On going" : "Winner: #{game.winner}" %></p>
-          <p>Made by: <%= game.user.email %></p>
-        <% end %>
+        <%= render 'game_card', game: game %>
       </div>
     <% end %>
   </div>
