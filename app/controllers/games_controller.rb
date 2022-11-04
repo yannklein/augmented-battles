@@ -1,5 +1,5 @@
 class GamesController < ApplicationController
-  before_action :set_game, only: [:update, :next_next]
+  before_action :set_game, only: [:update, :next_next, :show, :live]
   def index
     @game = Game.new
     @games = Game.where(user: current_user).includes(:user, :winner)
@@ -25,6 +25,14 @@ class GamesController < ApplicationController
       render 'show'
     end
   end
+  
+  def show
+    @qr_code = RQRCode::QRCode.new(game_live_path(@game))
+    @svg = @qr_code.as_svg
+  end
+
+  def live
+  end
 
   def next_turn
     next_player = arrays_next(game.players, game.turn)
@@ -33,15 +41,15 @@ class GamesController < ApplicationController
     redirect_to game_path(game)
   end
 
+  private
+
   def arrays_next(array, element)
     next_index = array.index(element) + 1
     next_index < array.size ? array[next_index] : array[0]
   end
 
-  private
-
   def set_game
-    game = Game.find(params[:id])
+    @game = Game.find(params[:id])
   end
 
   def game_params

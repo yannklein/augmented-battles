@@ -1,0 +1,6 @@
+<div class="container my-5">
+  <h1>Battle #<%= @game.id %></h1>
+  <%= link_to 'Join', game_live_path(@game), class: 'btn btn-primary my-5'  %>
+  <p>Or via QR code:</p>
+  <%= @svg.html_safe %>
+</div>
