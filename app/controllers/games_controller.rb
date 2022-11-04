@@ -1,5 +1,5 @@
 class GamesController < ApplicationController
-  before_action :set_game, only: [:update, :next_next, :show, :live]
+  before_action :set_game, only: [:update, :next_next, :show, :live, :join]
   def index
     @game = Game.new
     @games = Game.where(user: current_user).includes(:user, :winner)
@@ -29,6 +29,16 @@ class GamesController < ApplicationController
   def show
     @qr_code = RQRCode::QRCode.new(game_live_path(@game))
     @svg = @qr_code.as_svg
+  end
+
+  def join
+    new_army = Army.create(
+      category: Army.categories.values.sample,
+      game: @game,
+      user: current_user
+    )
+    new_army.populate(5)
+    render :live
   end
 
   def live

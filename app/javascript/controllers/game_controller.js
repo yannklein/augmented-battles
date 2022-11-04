@@ -3,7 +3,7 @@ import "mind-ar/dist/mindar-image-three.prod.js";
 
 // Connects to data-controller="game"
 export default class extends Controller {
-  static targets = ['start', 'stop', 'container']
+  static targets = ['container']
   
   connect() {
     console.log("Hello from GamesController")

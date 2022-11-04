@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_10_21_071245) do
+ActiveRecord::Schema[7.0].define(version: 2022_11_04_052652) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -37,7 +37,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_10_21_071245) do
   end
 
   create_table "soldiers", force: :cascade do |t|
-    t.integer "type"
     t.integer "skirmish_power"
     t.integer "distance_power"
     t.integer "max_distance"
@@ -45,6 +44,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_10_21_071245) do
     t.bigint "army_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "category"
     t.index ["army_id"], name: "index_soldiers_on_army_id"
   end
 
