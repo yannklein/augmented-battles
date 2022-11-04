@@ -1,0 +1,12 @@
+#game-container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+#game-control {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+}
