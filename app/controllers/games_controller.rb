@@ -19,8 +19,8 @@ class GamesController < ApplicationController
   end
 
   def update
-    if game.update(game_params)
-      redirect_to game_path(game)
+    if @game.update(game_params)
+      redirect_to game_path(@game)
     else
       render 'show'
     end
@@ -38,7 +38,7 @@ class GamesController < ApplicationController
       user: current_user
     )
     new_army.populate(5)
-    redirect_to game_live_path(game)
+    redirect_to game_live_path(@game)
   end
 
   def live
@@ -50,10 +50,10 @@ class GamesController < ApplicationController
   end
 
   def next_turn
-    next_player = arrays_next(game.players, game.turn)
-    game.turn = next_player
-    game.save
-    redirect_to game_path(game)
+    next_player = arrays_next(@game.players, @game.turn)
+    @game.turn = next_player
+    @game.save
+    redirect_to game_path(@game)
   end
 
   private
