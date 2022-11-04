@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus";
 import "mind-ar/dist/mindar-image-three.prod.js";
+import porcelainImg from '/public/matcap-porcelain-white.jpg';
 
 // Connects to data-controller="game"
 export default class extends Controller {
@@ -11,6 +12,7 @@ export default class extends Controller {
   connect() {
     console.log("Hello from GamesController")
     this.imageTargetUrl = "/characters/targets.mind"
+    this.imageAssetUrl = "/characters/3dAssets/"
     this.imageTargets = ['alien','ancestor','black_hole','eva','gaia','god_eye','light_cone','lilith','nova','ocean','octopod','omni_eye','rising_sun','shell','triangle']
     this.imageTargetMax = 5
     console.log(this.armiesValue);
@@ -57,7 +59,41 @@ export default class extends Controller {
       opacity: 0.8,
     });
     const plane = new this.THREE.Mesh(geometry, material);
+    plane.position.z = 0.1;
     anchor.group.add(plane);
+
+    const circle = new this.THREE.Mesh(
+      new this.THREE.CircleGeometry( soldier.max_distance / 5, 32 ),
+      new this.THREE.MeshBasicMaterial( { 
+        color: 0xffff00,
+        transparent: true,
+        opacity: 0.2 } )
+    );
+    anchor.group.add( circle );
+
+    { 
+      const manager = new this.THREE.LoadingManager();
+      const textureLoader = new this.THREE.TextureLoader(manager);
+      textureLoader.load(porcelainImg, porcelain => {
+        const material = new this.THREE.MeshMatcapMaterial({ side: this.THREE.DoubleSide, matcap: porcelain });
+        const STLLoader = require('three-stl-loader')(this.THREE)
+        const loader = new STLLoader()
+        loader.load(
+            `${this.imageAssetUrl}${soldier.category}.stl`,
+            (geometry) => {
+                const mesh = new this.THREE.Mesh(geometry, material)
+                mesh.scale.set( 0.05, 0.05, 0.05 );
+                anchor.group.add(mesh)
+            },
+            (xhr) => {
+                console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+            },
+            (error) => {
+                console.log(error)
+            }
+        )
+      })
+    }
 
     const text = `${soldier.name} ${soldier.skirmish_power}/${soldier.distance_power}`;
     const fontSize = 12;
@@ -90,7 +126,7 @@ export default class extends Controller {
     const mesh = new this.THREE.Mesh(new this.THREE.PlaneGeometry(textWidth/60, textHeight/60, 10, 10), material);
         
     mesh.position.y = 0;
-    mesh.position.z = 0.1;
+    mesh.position.z = 0.2;
     mesh.position.x = 0;
     return mesh  
   }

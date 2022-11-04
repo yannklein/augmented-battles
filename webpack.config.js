@@ -16,5 +16,27 @@ module.exports = {
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1
     })
-  ]
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.txt$/,
+        use: 'raw-loader'
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg|gltf|glb|bin)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              esModule: false,
+              name: '[name].[ext]',
+              outputPath: '/',
+              publicPath: '/'
+            }
+          }
+        ]
+      }
+    ]
+  }
 }
