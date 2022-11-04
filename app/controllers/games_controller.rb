@@ -38,10 +38,15 @@ class GamesController < ApplicationController
       user: current_user
     )
     new_army.populate(5)
-    render :live
+    redirect_to game_live_path(game)
   end
 
   def live
+    @armies = {}
+    @game.armies.each do |army|
+      @armies[army.user.email] = army.soldiers.map { |soldier| soldier.as_json }
+    end
+    @armies = @armies.to_json
   end
 
   def next_turn
