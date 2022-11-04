@@ -18,5 +18,5 @@ class Soldier < ApplicationRecord
     :triangle
   ]
   enum :category, CATEGORIES
-  validates :category, :skirmish_power, :distance_power, :max_distance, :speed, presence: true
+  validates :name, :category, :skirmish_power, :distance_power, :max_distance, :speed, presence: true
 end
