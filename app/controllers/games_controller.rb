@@ -46,7 +46,6 @@ class GamesController < ApplicationController
     @game.armies.each do |army|
       @armies[army.user.email] = army.soldiers.map { |soldier| soldier.as_json }
     end
-    @armies = @armies.to_json
   end
 
   def next_turn

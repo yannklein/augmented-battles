@@ -1,6 +1,7 @@
-<div data-controller="game" data-game-armies-value=<%= @armies %>>
+<div data-controller="game" data-game-armies-value=<%= @armies.to_json %> >
   <div id="game-control">
     <p>Augmented Battles</p>
+    <p><%= @armies['yann@me.com'].map { |army| [army['name'], army['category']]} %></p>
   </div>
   <div 
     id="game-container"
