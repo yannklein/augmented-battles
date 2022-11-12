@@ -5,10 +5,10 @@ class Army < ApplicationRecord
   enum :category, [:earth, :sirius, :centauri, :aldebaran]
 
   def populate(num)
-    num.times do
+    num.times do |index|
       new_soldier = Soldier.new( 
         name: Faker::Games::Heroes.name,
-        category: Soldier.categories.values.sample, 
+        category: index, 
         skirmish_power: rand(1..11), 
         distance_power: rand(1..11), 
         max_distance: rand(1..11), 
