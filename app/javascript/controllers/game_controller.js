@@ -18,6 +18,7 @@ export default class extends Controller {
     this.imageMarkerFolder = "/characters/markers/";
     this.imageMarkers = ["m1", "m2", "m3", "m4", "m5", "m6"];
     this.imageAssetUrl = "/characters/3dAssets/";
+    this.playerColor = ['#ff0000', '#00ff00']
     this.initARJS();
   }
 
@@ -34,7 +35,7 @@ export default class extends Controller {
 		this.renderer.domElement.style.position = 'absolute'
 		this.renderer.domElement.style.top = '0px'
 		this.renderer.domElement.style.left = '0px'
-		this.element.appendChild(this.renderer.domElement);
+		document.body.appendChild(this.renderer.domElement);
 
 		// array of functions for the rendering loop
 		const onRenderFcts = [];
@@ -81,7 +82,7 @@ export default class extends Controller {
 			arToolkitContext = this.initARContext(arToolkitSource)
       setTimeout(() => {
         onResize();
-      }, 100);
+      }, 200);
 			onResize()
 		})
 
@@ -160,6 +161,8 @@ export default class extends Controller {
     const arToolkitContext = new THREEx.ArToolkitContext({
       cameraParametersUrl: THREEx.ArToolkitContext.baseURL + 'camera_para.dat',
       detectionMode: 'mono',
+      canvasWidth: window.innerWidth,
+      canvasHeight: window.innerWidth,
     })
     // initialize it
     arToolkitContext.init(() => {
@@ -184,40 +187,36 @@ export default class extends Controller {
   }
 
   createStuffs(){
-    const player = 'yann@me.com';
-    this.armiesValue[player].forEach((soldier, index) => {
-      // add a gizmo in the center of the marker
-      // var geometry = new THREE.OctahedronGeometry(0.1, 0)
-      // var material = new THREE.MeshNormalMaterial({
-      //   wireframe: true
-      // });
-      // var mesh = new THREE.Mesh(geometry, material);
-      // marker.add(mesh);
-      this.createSoldier(soldier, index)
+    let markerIndex = 0;
+    Object.keys(this.armiesValue).forEach((player) => {
+      this.armiesValue[player]['army'].forEach((soldier) => {
+        this.createSoldier(soldier, this.armiesValue[player]['color'], markerIndex)
+        markerIndex += 1;
+      });
     });
   }
 
-  createSoldier(soldier, index) {
+  createSoldier(soldier, color, index) {
     const markerRoot = this.markers[index]
     const soldierGroup = new THREE.Group;
     soldierGroup.name = `${soldier.name}`;
 
     const geometry = new THREE.PlaneGeometry(1, 1);
     const material = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
+      color: color,
       transparent: true,
-      opacity: 0.8,
+      opacity: 1,
     });
     const plane = new THREE.Mesh(geometry, material);
-    plane.position.z = 0.1;
+    plane.position.z = 0.05;
     soldierGroup.add(plane);
 
     const circle = new THREE.Mesh(
       new THREE.CircleGeometry(soldier.max_distance / 5, 32),
       new THREE.MeshBasicMaterial({
-        color: 0xffff00,
+        color: color,
         transparent: true,
-        opacity: 0.2,
+        opacity: 0.1,
       })
     );
     soldierGroup.add(circle);
@@ -236,6 +235,7 @@ export default class extends Controller {
           (geometry) => {
             const mesh = new THREE.Mesh(geometry, material);
             mesh.scale.set(0.05, 0.05, 0.05);
+            mesh.position.z = 0.1;
             soldierGroup.add(mesh);
           },
           (xhr) => {

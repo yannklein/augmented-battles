@@ -29,5 +29,5 @@ army2 = Army.create!(
   user: u2,
   game: game,
 )
-army1.populate(3)
+army2.populate(3)
 puts "Created"
