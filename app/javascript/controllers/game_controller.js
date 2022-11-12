@@ -205,7 +205,7 @@ export default class extends Controller {
     const material = new THREE.MeshBasicMaterial({
       color: color,
       transparent: true,
-      opacity: 1,
+      opacity: 0.5,
     });
     const plane = new THREE.Mesh(geometry, material);
     plane.position.z = 0.05;
