@@ -16,6 +16,12 @@ export default class extends Controller {
     this.imageMarkerFolder = "/characters/markers/";
     this.imageMarkers = ["m1", "m2", "m3", "m4", "m5", "m6"];
     this.playerColor = ['#ff0000', '#00ff00']
+    // raycasting variables
+    this.pointer = new THREE.Vector2();
+    this.pointer.x = 0;
+    this.pointer.y = 0;
+    this.raycaster = new THREE.Raycaster();
+
     this.initARJS();
   }
 
@@ -39,22 +45,22 @@ export default class extends Controller {
 		// let arToolkitContext, markerControls;
     let arToolkitContext;
 		// init scene and camera
-		const scene = new THREE.Scene();
+		this.scene = new THREE.Scene();
 
 		//////////////////////////////////////////////////////////////////////////////////
 		//		Initialize a basic camera
 		//////////////////////////////////////////////////////////////////////////////////
 
 		// Create a camera
-		this.camera = new THREE.Camera();
-		scene.add(this.camera);
+		this.camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 ); 
+		this.scene.add(this.camera);
 
     // Create the marker roots
     this.markers = []
     this.imageMarkers.forEach((imageMarker) => {
       const markerRoot = new THREE.Group;
       markerRoot.name = imageMarker;
-      scene.add(markerRoot);
+      this.scene.add(markerRoot);
       this.markers.push(markerRoot);
     });
 
@@ -112,8 +118,11 @@ export default class extends Controller {
 
 		// render the scene
 		onRenderFcts.push(() => {
-			this.renderer.render(scene, this.camera);
+			this.renderer.render(this.scene, this.camera);
 		})
+
+    // Listen to mouse move for Raycasting
+    window.addEventListener('click', this.onSelect.bind(this));
 
 		// run the rendering loop
 		var lastTimeMsec = null
@@ -130,6 +139,7 @@ export default class extends Controller {
 			})
 		}
     requestAnimationFrame(animate)
+
   }
 
   initARContext(arToolkitSource){
@@ -191,6 +201,24 @@ export default class extends Controller {
         new Soldier(soldier, this.armiesValue[player]['color'], markerRoot)
         markerIndex += 1;
       });
+    });
+  }
+
+  onSelect(event) {
+    console.log(this);
+    // calculate pointer position in normalized device coordinates
+    // (-1 to +1) for both components
+    this.pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    this.pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+    // update the picking ray with the camera and pointer position
+    this.raycaster.setFromCamera( this.pointer, this.camera );
+
+    // calculate objects intersecting the picking ray
+    const intersects = this.raycaster.intersectObjects( this.scene.children );
+    // console.log(this.pointer, intersects);
+    intersects.forEach((intersect) => {
+      intersect.object.material.color.set( 0xff0000 );
     });
   }
 }

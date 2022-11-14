@@ -64,6 +64,10 @@ export default class Soldier {
     });
   }
 
+  // createSelectFeature() {
+    
+  // }
+
   createSoldier() {
     const soldierGroup = new THREE.Group();
     soldierGroup.name = this.soldier.name;
@@ -83,6 +87,8 @@ export default class Soldier {
       12
     );
     soldierGroup.add(text);
+
+    // createSelectFeature(soldierGroup);
 
     soldierGroup.rotateX(-Math.PI / 2);
     this.marker.add(soldierGroup);
