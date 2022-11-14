@@ -12,16 +12,27 @@ export default class Soldier {
     this.createSoldier();
   }
 
+  select() {
+    this.range.material.opacity = 0.5;
+    this.base.material.opacity = 0.5;
+  }
+
+  unselect() {
+    this.range.material.opacity = 0.1;
+    this.base.material.opacity = 0.1;
+  }
+
   createBase() {
     const geometry = new THREE.PlaneGeometry(1, 1);
     const material = new THREE.MeshBasicMaterial({
       color: this.color,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.1,
     });
 
     const plane = new THREE.Mesh(geometry, material);
     plane.position.z = 0.05;
+    plane.marker = this.marker;
     return plane;
   }
 
@@ -34,6 +45,7 @@ export default class Soldier {
         opacity: 0.1,
       })
     );
+    circle.marker = this.marker;
     return circle;
   }
 
@@ -52,6 +64,7 @@ export default class Soldier {
           const mesh = new THREE.Mesh(geometry, material);
           mesh.scale.set(0.05, 0.05, 0.05);
           mesh.position.z = 0.1;
+          mesh.marker = this.marker;
           callback(mesh);
         },
         (xhr) => {
@@ -69,29 +82,29 @@ export default class Soldier {
   // }
 
   createSoldier() {
-    const soldierGroup = new THREE.Group();
-    soldierGroup.name = this.soldier.name;
+    this.soldierGroup = new THREE.Group();
+    this.soldierGroup.name = this.soldier.name;
 
-    const base = this.createBase();
-    soldierGroup.add(base);
+    this.base = this.createBase();
+    this.soldierGroup.add(this.base);
 
-    const range = this.createRange();
-    soldierGroup.add(range);
+    this.range = this.createRange();
+    this.soldierGroup.add(this.range);
 
     this.createAsset((asset) => {
-      soldierGroup.add(asset);
+      this.soldierGroup.add(asset);
     });
 
-    const text = this.createText(
+    this.text = this.createText(
       `${this.soldier.name} ${this.soldier.skirmish_power}/${this.soldier.distance_power}`,
       12
     );
-    soldierGroup.add(text);
+    this.soldierGroup.add(this.text);
 
-    // createSelectFeature(soldierGroup);
+    // createSelectFeature(this.soldierGroup);
 
-    soldierGroup.rotateX(-Math.PI / 2);
-    this.marker.add(soldierGroup);
+    this.soldierGroup.rotateX(-Math.PI / 2);
+    this.marker.add(this.soldierGroup);
   }
 
   createText(text, fontSize) {

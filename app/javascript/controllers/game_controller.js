@@ -194,18 +194,18 @@ export default class extends Controller {
   }
 
   createStuffs(){
+    this.soldiers = []
     let markerIndex = 0;
     Object.keys(this.armiesValue).forEach((player) => {
       this.armiesValue[player]['army'].forEach((soldier) => {
         const markerRoot = this.markers[markerIndex]
-        new Soldier(soldier, this.armiesValue[player]['color'], markerRoot)
+        this.soldiers.push(new Soldier(soldier, this.armiesValue[player]['color'], markerRoot))
         markerIndex += 1;
       });
     });
   }
 
   onSelect(event) {
-    console.log(this);
     // calculate pointer position in normalized device coordinates
     // (-1 to +1) for both components
     this.pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -216,9 +216,17 @@ export default class extends Controller {
 
     // calculate objects intersecting the picking ray
     const intersects = this.raycaster.intersectObjects( this.scene.children );
-    // console.log(this.pointer, intersects);
+
+    // unselect all soldiers
+    this.soldiers.forEach(soldier => soldier.unselect())
+    // select the intersecting soldier
     intersects.forEach((intersect) => {
-      intersect.object.material.color.set( 0xff0000 );
+      const soldier = this.soldiers.find(sold => {
+        console.log(sold.marker, intersect.object.marker);
+        return sold.marker === intersect.object.marker
+      })
+      console.log(soldier);
+      soldier?.select();
     });
   }
 }
