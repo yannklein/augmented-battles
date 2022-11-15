@@ -2,7 +2,7 @@ class GamesController < ApplicationController
   before_action :set_game, only: [:update, :next_next, :show, :live, :join]
   def index
     @game = Game.new
-    @games = Game.where(user: current_user).includes(:user, :winner)
+    @games = Game.joins(:armies).where(armies: {user: current_user}).includes(:user, :winner)
   end
 
   def create
@@ -37,7 +37,7 @@ class GamesController < ApplicationController
       game: @game,
       user: current_user
     )
-    new_army.populate(5)
+    new_army.populate(3)
     redirect_to game_live_path(@game)
   end
 
@@ -46,6 +46,7 @@ class GamesController < ApplicationController
     player_color = ['d82b2b', '2b962b']
     @game.armies.each_with_index do |army, index|
       @armies[army.user.email] = {}
+      @armies[army.user.email]['turn'] = army.user.email == @game.turn.email
       @armies[army.user.email]['army'] = army.soldiers.map { |soldier| soldier.as_json }
       @armies[army.user.email]['color'] = player_color[index]
     end

@@ -10,7 +10,7 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
   </head>
 
-  <body style='<%= current_page?(action: "live") ? "overflow: hidden" : "" %>' >
+  <body style='<%= current_page?("live") ? "overflow: hidden" : "" %>' >
   <%#= render "shared/navbar" %>
   <%= render "shared/flashes" %>
   <div style="height: 100vh">
