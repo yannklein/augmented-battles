@@ -5,7 +5,9 @@
         <p>Player <%= index + 1 %>: <span><%= player %></span></p>
         <ul class="list-inline m-0">
           <% squad['army'].each do |soldier| %>
-            <li class="list-inline-item m-0" id="life-<%= soldier['name']%>"><i class="fa-solid fa-hand-fist"></i></li>
+            <li class="list-inline-item m-0" id="life-<%= soldier['name']%>" style="color: #<%= squad['color'] %>">
+              <i class="fa-solid fa-hand-fist"></i>
+            </li>
           <% end %>
         </ul>
       </div>
@@ -15,5 +17,12 @@
       <p><%= player %>: <%= squad['color'] %> - <%= squad['army'].map { |soldier| [soldier['name'], soldier['category']]} %></p>
       <% end %>
     <% end %>
+  </div>
+  <div class="game-setting">
+    <ul class="game-setting-menu">
+      <li>Profil</li>
+      <li>Back</li>
+    </ul>
+    <i class="fa-solid fa-gear"></i>
   </div>
 </div>

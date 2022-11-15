@@ -43,7 +43,7 @@ class GamesController < ApplicationController
 
   def live
     @armies = {}
-    player_color = [0xff0000, 0x00ff00]
+    player_color = ['d82b2b', '2b962b']
     @game.armies.each_with_index do |army, index|
       @armies[army.user.email] = {}
       @armies[army.user.email]['army'] = army.soldiers.map { |soldier| soldier.as_json }

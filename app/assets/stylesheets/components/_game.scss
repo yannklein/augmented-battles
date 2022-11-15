@@ -3,38 +3,67 @@
   height: 100vh;
   position: relative;
   overflow: hidden;
-  border: 16px solid $deep-blue;
-  box-shadow: inset 0px 0px 16px 16px $deep-blue;
+  border: 4px solid $deep-blue;
+  box-shadow: inset 0px 0px 4px 4px $deep-blue;
 }
 .game-ctrl {
   z-index: 2;
   display: flex;
   justify-content: space-between;
   width: 100%;
-  padding: 24px;
-  .game-ctrl-player {
+  padding: 16px;
+}
+.game-setting {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2;
+  text-align: right;
+  i {
+    text-shadow: 0px 0px 12px $blue;
+    color: $deep-blue;
+    font-size: 40px;
+  }
+  .game-setting-menu {
     padding: 16px;
-    background: rgb(85,129,191);
-    background: linear-gradient(135deg, rgba(85,129,191,1) 9%, rgba(20,64,126,1) 54%, rgba(52,50,86,1) 100%);
-    &.player-turn {
-      border: 2px solid white;
+    list-style: none;
+    background-color: white;
+    width: 120px;
+    background: $blue-gradient;
+    border: 4px solid #87b0f200;
+    color: $blue;
+    li {
+      padding: 4px;
+      border-top: 1px solid $deep-blue;
+      &:last-child {
+        border-bottom: 1px solid $deep-blue;
+      }
     }
-    &.player-left {
-      clip-path: polygon(0% 0%, 100% 0%, 100% 60%, 70% 100%, 0% 100%);
-      text-align: left;
-    }
-    &.player-right {
-      text-align: right;
-      clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 30% 100%, 0% 60%);
-    }
-    p {
-      margin-bottom: 8px;
-    }
-    ul {
-      font-size: 20px;
-    }
-    span {
-      color: white;
-    }
+  }
+}
+.game-ctrl-player {
+  padding: 16px;
+  background: $blue-gradient;
+  width: 240px;
+  border: 4px solid #87b0f200;
+  &.player-turn {
+    border: 4px solid $blue;
+  }
+  &.player-left {
+    clip-path: polygon(0% 0%, 100% 0%, 100% 60%, 70% 100%, 0% 100%);
+    text-align: left;
+  }
+  &.player-right {
+    text-align: right;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 30% 100%, 0% 60%);
+  }
+  p {
+    margin-bottom: 8px;
+  }
+  ul {
+    font-size: 20px;
+  }
+  span {
+    color: white;
   }
 }

@@ -14,7 +14,6 @@ export default class extends Controller {
     console.log(this.armiesValue);
     this.imageMarkerFolder = "/characters/markers/";
     this.imageMarkers = ["m1", "m2", "m3", "m4", "m5", "m6"];
-    this.playerColor = ['#ff0000', '#00ff00']
     // raycasting variables
     this.pointer = new THREE.Vector2();
     this.pointer.x = 0;

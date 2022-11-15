@@ -5,7 +5,7 @@ import porcelainImg from "/public/matcap-porcelain-white.jpg";
 export default class Soldier {
   constructor(soldier, color, marker) {
     this.soldier = soldier;
-    this.color = color;
+    this.color = parseInt(color,16);
     this.marker = marker;
     this.imageAssetUrl = "/characters/3dAssets/";
     this.porcelainImg = porcelainImg;
