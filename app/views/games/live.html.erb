@@ -20,8 +20,8 @@
   </div>
   <div class="game-setting">
     <ul class="game-setting-menu active">
-      <li><a href="#">Profil</a></li>
-      <li><a href="#">Back</a></li>
+      <li><%= link_to "Profil", game_path(@game) %></li>
+      <li><%= link_to "Back", game_path(@game) %></li>
     </ul>
     <a href="#"><i class="fa-solid fa-gear"></i></a>
   </div>
