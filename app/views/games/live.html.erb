@@ -1,13 +1,19 @@
-<div data-controller="game" data-game-armies-value=<%= @armies.to_json %> >
-  <div id="game-control">
-    <p>Augmented Battles</p>
-    <% @armies.each do |player, squad| %>
-    <p><%= player %>: <%= squad['color'] %> - <%= squad['army'].map { |army| [army['name'], army['category']]} %></p>
+<div class="game-frame" data-controller="game" data-game-armies-value=<%= @armies.to_json %> >
+  <div class="game-ctrl">
+    <% @armies.each_with_index do |(player, squad), index| %>
+      <div class="game-ctrl-player <%= index == 0 ? "player-left player-turn" : "player-right" %>">
+        <p>Player <%= index + 1 %>: <span><%= player %></span></p>
+        <ul class="list-inline m-0">
+          <% squad['army'].each do |soldier| %>
+            <li class="list-inline-item m-0" id="life-<%= soldier['name']%>"><i class="fa-solid fa-hand-fist"></i></li>
+          <% end %>
+        </ul>
+      </div>
     <% end %>
-    
-  </div>
-  <div 
-    id="game-container"
-    data-game-target="container">
+    <% if false %>
+      <% @armies.each do |player, squad| %>
+      <p><%= player %>: <%= squad['color'] %> - <%= squad['army'].map { |soldier| [soldier['name'], soldier['category']]} %></p>
+      <% end %>
+    <% end %>
   </div>
 </div>

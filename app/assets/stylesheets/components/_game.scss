@@ -1,12 +1,40 @@
-#game-container {
+.game-frame {
   width: 100vw;
   height: 100vh;
   position: relative;
   overflow: hidden;
+  border: 16px solid $deep-blue;
+  box-shadow: inset 0px 0px 16px 16px $deep-blue;
 }
-#game-control {
-  position: fixed;
-  top: 16px;
-  left: 16px;
+.game-ctrl {
   z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 24px;
+  .game-ctrl-player {
+    padding: 16px;
+    background: rgb(85,129,191);
+    background: linear-gradient(135deg, rgba(85,129,191,1) 9%, rgba(20,64,126,1) 54%, rgba(52,50,86,1) 100%);
+    &.player-turn {
+      border: 2px solid white;
+    }
+    &.player-left {
+      clip-path: polygon(0% 0%, 100% 0%, 100% 60%, 70% 100%, 0% 100%);
+      text-align: left;
+    }
+    &.player-right {
+      text-align: right;
+      clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 30% 100%, 0% 60%);
+    }
+    p {
+      margin-bottom: 8px;
+    }
+    ul {
+      font-size: 20px;
+    }
+    span {
+      color: white;
+    }
+  }
 }

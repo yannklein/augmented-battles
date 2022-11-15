@@ -6,7 +6,6 @@ THREEx.ArToolkitContext.baseURL = "/";
 
 // Connects to data-controller="game"
 export default class extends Controller {
-  static targets = ["container"];
   static values = {
     armies: Object,
   };
@@ -38,7 +37,7 @@ export default class extends Controller {
 		this.renderer.domElement.style.position = 'absolute'
 		this.renderer.domElement.style.top = '0px'
 		this.renderer.domElement.style.left = '0px'
-		document.body.appendChild(this.renderer.domElement);
+		this.element.appendChild(this.renderer.domElement);
 
 		// array of functions for the rendering loop
 		const onRenderFcts = [];
@@ -215,7 +214,7 @@ export default class extends Controller {
     this.raycaster.setFromCamera( this.pointer, this.camera );
 
     // calculate objects intersecting the picking ray
-    const intersects = this.raycaster.intersectObjects( this.scene.children );
+    const intersects = this.raycaster.intersectObjects( this.markers.map( marker => marker.base) );
 
     // unselect all soldiers
     this.soldiers.forEach(soldier => soldier.unselect())

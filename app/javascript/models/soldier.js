@@ -33,6 +33,7 @@ export default class Soldier {
     const plane = new THREE.Mesh(geometry, material);
     plane.position.z = 0.05;
     plane.marker = this.marker;
+    this.marker.base = plane;
     return plane;
   }
 
