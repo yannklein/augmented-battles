@@ -2,7 +2,7 @@
   class="game-frame" 
   data-controller="game" 
   data-game-armies-value=<%= @armies.to_json %> 
-  data-game-currentUser-value=<%= current_user %>
+  data-game-currentuser-value='<%= current_user.email %>'
 >
   <div class="game-score">
     <% @armies.each_with_index do |(player, squad), index| %>

@@ -8,7 +8,7 @@ THREEx.ArToolkitContext.baseURL = "/"
 export default class extends Controller {
   static values = {
     armies: Object,
-    currentUser: String
+    currentuser: String
   }
   static targets = ['move', 'attack', 'defense', 'settingMenu']
 
@@ -29,7 +29,9 @@ export default class extends Controller {
       attack: this.attackTarget, 
       defense: this.defenseTarget
     }
-    this.turn = 'move'
+    console.log(Object.keys(this.armiesValue)[0], this.currentuserValue);
+    this.turn = this.currentuserValue == Object.keys(this.armiesValue)[0] ? 'move' : 'defense'
+    this.updateStepControls()
 
     this.initARJS()
   }
