@@ -2,7 +2,7 @@
   class="game-frame" 
   data-controller="game" 
   data-game-armies-value=<%= @armies.to_json %> 
-  data-game-currentuser-value=<%= current_user %>
+  data-game-currentUser-value=<%= current_user %>
 >
   <div class="game-score">
     <% @armies.each_with_index do |(player, squad), index| %>
@@ -31,17 +31,17 @@
     <a href="#"><i class="fa-solid fa-gear"></i></a>
   </div>
   <div class="game-ctrl">
-    <div class="game-ctrl-msg active">
+    <div data-game-target="move" class="game-ctrl-msg active">
       <p>Your turn! <i class="fa-solid fa-arrows-up-down-left-right"></i></p>
-      <a href="">Continue to attack <i class="fa-solid fa-bolt"></i></a>
+      <a href="#" data-action="click->game#nextTurn:prevent" >Continue to attack <i class="fa-solid fa-bolt"></i></a>
     </div>
-    <div class="game-ctrl-msg">
+    <div data-game-target="attack" class="game-ctrl-msg">
       <p>Time to attack! <i class="fa-solid fa-bolt"></i></p>
-      <a href="">Next player <i class="fa-solid fa-forward"></i></a>
+      <a href="#" data-action="click->game#nextTurn:prevent" >Next player <i class="fa-solid fa-forward"></i></a>
     </div>
-    <div class="game-ctrl-msg">
+    <div data-game-target="defense" class="game-ctrl-msg">
       <p>Defense time! <i class="fa-solid fa-shield-halved"></i></p>
-      <a class="inactive" href="">Wait for your turn...</a>
+      <span class="inactive">Wait for your turn...</span>
     </div>
   </div>
 </div>

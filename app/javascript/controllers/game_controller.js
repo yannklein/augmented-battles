@@ -1,27 +1,51 @@
-import { Controller } from "@hotwired/stimulus";
-import * as THREE from "three";
-import * as THREEx from "@ar-js-org/ar.js/three.js/build/ar-threex.js";
-import Soldier from "../models/soldier";
-THREEx.ArToolkitContext.baseURL = "/";
+import { Controller } from "@hotwired/stimulus"
+import * as THREE from "three"
+import * as THREEx from "@ar-js-org/ar.js/three.js/build/ar-threex.js"
+import Soldier from "../models/soldier"
+THREEx.ArToolkitContext.baseURL = "/"
 
 // Connects to data-controller="game"
 export default class extends Controller {
   static values = {
     armies: Object,
-  };
+    currentUser: String
+  }
+  static targets = ['move', 'attack', 'defense']
 
   connect() {
-    console.log(this.armiesValue);
-    this.imageMarkerFolder = "/characters/markers/";
-    this.imageMarkers = ["m1", "m2", "m3", "m4", "m5", "m6"];
-    
-    // raycasting variables
-    this.pointer = new THREE.Vector2();
-    this.pointer.x = 0;
-    this.pointer.y = 0;
-    this.raycaster = new THREE.Raycaster();
+    console.log(this.armiesValue)
+    this.imageMarkerFolder = "/characters/markers/"
+    this.imageMarkers = ["m1", "m2", "m3", "m4", "m5", "m6"]
 
-    this.initARJS();
+    // raycasting variables
+    this.pointer = new THREE.Vector2()
+    this.pointer.x = 0
+    this.pointer.y = 0
+    this.raycaster = new THREE.Raycaster()
+
+    // initialize turn
+    this.stepControls = {
+      move: this.moveTarget, 
+      attack: this.attackTarget, 
+      defense: this.defenseTarget
+    }
+    this.turn = 'move'
+
+    this.initARJS()
+  }
+
+  nextTurn() {
+    console.log(this.stepControls);
+    const steps = Object.keys(this.stepControls)
+    const currentTurn = steps.indexOf(this.turn)
+    const nextTurn = currentTurn < steps.length - 1 ? currentTurn + 1 : 0
+    this.turn = steps[nextTurn]
+    console.log("next turn", this.turn);
+    this.updateStepControls()
+  }
+  updateStepControls() {
+    Object.values(this.stepControls).forEach(stepTarget => stepTarget.classList.remove("active"))
+    this.stepControls[this.turn].classList.add("active")
   }
 
   initARJS() {
@@ -30,38 +54,38 @@ export default class extends Controller {
       antialias: true,
       autoResize: true,
       alpha: true
-		});
+		})
 		this.renderer.setClearColor(new THREE.Color('lightgrey'), 0)
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.setSize(window.innerWidth, window.innerHeight)
+    this.renderer.setPixelRatio(window.devicePixelRatio)
 		this.renderer.domElement.style.position = 'absolute'
 		this.renderer.domElement.style.top = '0px'
 		this.renderer.domElement.style.left = '0px'
-		this.element.appendChild(this.renderer.domElement);
+		this.element.appendChild(this.renderer.domElement)
 
 		// array of functions for the rendering loop
-		const onRenderFcts = [];
-		// let arToolkitContext, markerControls;
-    let arToolkitContext;
+		const onRenderFcts = []
+		// let arToolkitContext, markerControls
+    let arToolkitContext
 		// init scene and camera
-		this.scene = new THREE.Scene();
+		this.scene = new THREE.Scene()
 
 		//////////////////////////////////////////////////////////////////////////////////
 		//		Initialize a basic camera
 		//////////////////////////////////////////////////////////////////////////////////
 
 		// Create a camera
-		this.camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 ); 
-		this.scene.add(this.camera);
+		this.camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 ) 
+		this.scene.add(this.camera)
 
     // Create the marker roots
     this.markers = []
     this.imageMarkers.forEach((imageMarker) => {
-      const markerRoot = new THREE.Group;
-      markerRoot.name = imageMarker;
-      this.scene.add(markerRoot);
-      this.markers.push(markerRoot);
-    });
+      const markerRoot = new THREE.Group
+      markerRoot.name = imageMarker
+      this.scene.add(markerRoot)
+      this.markers.push(markerRoot)
+    })
 
 		////////////////////////////////////////////////////////////////////////////////
 		//          handle arToolkitSource
@@ -83,8 +107,8 @@ export default class extends Controller {
 		arToolkitSource.init(() =>  {
 			arToolkitContext = this.initARContext(arToolkitSource)
       setTimeout(() => {
-        onResize();
-      }, 200);
+        onResize()
+      }, 200)
 			onResize()
 		})
 
@@ -103,13 +127,13 @@ export default class extends Controller {
 		// update artoolkit on every frame
 		onRenderFcts.push(() => {
 			if (!arToolkitContext || !arToolkitSource || !arToolkitSource.ready) {
-				return;
+				return
 			}
 
 			arToolkitContext.update(arToolkitSource.domElement)
 		})
 
-		this.createStuffs();
+		this.createStuffs()
 
 		//////////////////////////////////////////////////////////////////////////////////
 		//		render the whole thing on the page
@@ -117,17 +141,17 @@ export default class extends Controller {
 
 		// render the scene
 		onRenderFcts.push(() => {
-			this.renderer.render(this.scene, this.camera);
+			this.renderer.render(this.scene, this.camera)
 		})
 
     // Listen to mouse move for Raycasting
-    window.addEventListener('click', this.onSelect.bind(this));
+    window.addEventListener('click', this.onSelect.bind(this))
 
 		// run the rendering loop
 		var lastTimeMsec = null
     const animate = (nowMsec) => {
       // keep looping
-			requestAnimationFrame(animate);
+			requestAnimationFrame(animate)
 			// measure time
 			lastTimeMsec = lastTimeMsec || nowMsec - 1000 / 60
 			var deltaMsec = Math.min(200, nowMsec - lastTimeMsec)
@@ -144,25 +168,25 @@ export default class extends Controller {
   initARContext(arToolkitSource){
     const getSourceOrientation = () => {
 			if (!arToolkitSource) {
-				return null;
+				return null
 			}
 
 			console.log(
 				'actual source dimensions',
 				arToolkitSource.domElement.videoWidth,
 				arToolkitSource.domElement.videoHeight
-			);
+			)
 
 			if (arToolkitSource.domElement.videoWidth > arToolkitSource.domElement.videoHeight) {
-				console.log('source orientation', 'landscape');
-				return 'landscape';
+				console.log('source orientation', 'landscape')
+				return 'landscape'
 			} else {
-				console.log('source orientation', 'portrait');
-				return 'portrait';
+				console.log('source orientation', 'portrait')
+				return 'portrait'
 			}
 		}
 
-    console.log('initARContext()');
+    console.log('initARContext()')
     // create atToolkitContext
     const arToolkitContext = new THREEx.ArToolkitContext({
       cameraParametersUrl: THREEx.ArToolkitContext.baseURL + 'camera_para.dat',
@@ -173,12 +197,12 @@ export default class extends Controller {
     // initialize it
     arToolkitContext.init(() => {
       // copy projection matrix to camera
-      this.camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
-      arToolkitContext.arController.orientation = getSourceOrientation();
-      arToolkitContext.arController.options.orientation = getSourceOrientation();
+      this.camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix())
+      arToolkitContext.arController.orientation = getSourceOrientation()
+      arToolkitContext.arController.options.orientation = getSourceOrientation()
 
-      console.log('arToolkitContext', arToolkitContext);
-      window.arToolkitContext = arToolkitContext;
+      console.log('arToolkitContext', arToolkitContext)
+      window.arToolkitContext = arToolkitContext
     })
     // build markerControls for markerRoot1
     this.markers.forEach((marker) => {
@@ -187,45 +211,45 @@ export default class extends Controller {
         patternUrl: `${this.imageMarkerFolder}pattern-${marker.name}.patt`,
         // patternUrl : THREEx.ArToolkitContext.baseURL + '../data/data/patt.kanji',
       })
-    });
+    })
 
-    return arToolkitContext;
+    return arToolkitContext
   }
 
   createStuffs(){
     this.soldiers = []
-    let markerIndex = 0;
+    let markerIndex = 0
     Object.keys(this.armiesValue).forEach((player) => {
       this.armiesValue[player]['army'].forEach((soldier) => {
         const markerRoot = this.markers[markerIndex]
         this.soldiers.push(new Soldier(soldier, this.armiesValue[player]['color'], markerRoot))
-        markerIndex += 1;
-      });
-    });
+        markerIndex += 1
+      })
+    })
   }
 
   onSelect(event) {
     // calculate pointer position in normalized device coordinates
     // (-1 to +1) for both components
-    this.pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    this.pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    this.pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1
+    this.pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1
 
     // update the picking ray with the camera and pointer position
-    this.raycaster.setFromCamera( this.pointer, this.camera );
+    this.raycaster.setFromCamera( this.pointer, this.camera )
 
     // calculate objects intersecting the picking ray
-    const intersects = this.raycaster.intersectObjects( this.markers.map( marker => marker.base) );
+    const intersects = this.raycaster.intersectObjects( this.markers.map( marker => marker.base) )
 
     // unselect all soldiers
     this.soldiers.forEach(soldier => soldier.unselect())
     // select the intersecting soldier
     intersects.forEach((intersect) => {
       const soldier = this.soldiers.find(sold => {
-        console.log(sold.marker, intersect.object.marker);
+        console.log(sold.marker, intersect.object.marker)
         return sold.marker === intersect.object.marker
       })
-      console.log(soldier);
-      soldier?.select();
-    });
+      console.log(soldier)
+      soldier?.select()
+    })
   }
 }
