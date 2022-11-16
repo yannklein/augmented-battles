@@ -2,12 +2,17 @@
   class="game-frame" 
   data-controller="game" 
   data-game-armies-value=<%= @armies.to_json %> 
-  data-game-currentuser-value='<%= current_user.email %>'
+  data-game-current-user-value='<%= current_user.id %>'
+  data-game-turn-user-value='<%= @game.turn.id %>'
   data-game-game-id-value='<%= @game.id %>'
 >
   <div class="game-score">
     <% @armies.each_with_index do |(player, squad), index| %>
-      <div class="game-score-player <%= index == 0 ? "player-left" : "player-right" %> <%= squad['turn'] ? "player-turn" : "" %> ">
+      <div 
+        class="game-score-player <%= index == 0 ? "player-left" : "player-right" %> <%= squad['turn'] ? "player-turn" : "" %> "
+        data-game-target="score"
+        data-user='<%= player %>'
+        >
         <p>Player <%= index + 1 %>: <span><%= player %></span></p>
         <ul class="list-inline m-0">
           <% squad['army'].each do |soldier| %>

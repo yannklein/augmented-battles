@@ -1,5 +1,5 @@
 class GamesController < ApplicationController
-  before_action :set_game, only: [:update, :next_next, :show, :live, :join]
+  before_action :set_game, only: [:update, :next_turn, :show, :live, :join]
   def index
     @game = Game.new
     @games = Game.joins(:armies).where(armies: {user: current_user}).includes(:user, :winner)
@@ -45,18 +45,24 @@ class GamesController < ApplicationController
     @armies = {}
     player_color = ['d82b2b', '2b962b']
     @game.armies.each_with_index do |army, index|
-      @armies[army.user.email] = {}
-      @armies[army.user.email]['turn'] = army.user.email == @game.turn.email
-      @armies[army.user.email]['army'] = army.soldiers.map { |soldier| soldier.as_json }
-      @armies[army.user.email]['color'] = player_color[index]
+      @armies[army.user.id] = {}
+      @armies[army.user.id]['turn'] = army.user.id == @game.turn.id
+      @armies[army.user.id]['army'] = army.soldiers.map { |soldier| soldier.as_json }
+      @armies[army.user.id]['color'] = player_color[index]
     end
   end
 
   def next_turn
     next_player = arrays_next(@game.players, @game.turn)
-    @game.turn = next_player
-    @game.save
-    redirect_to game_path(@game)
+    @game.update(turn: next_player)
+    GameChannel.broadcast_to(
+      @game,
+      {
+        game_id: @game.id,
+        turn_user: next_player.id
+      }.to_json
+    )
+    head :ok
   end
 
   private
