@@ -1,4 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
+import { createConsumer } from "@rails/actioncable"
+
+
 import * as THREE from "three"
 import * as THREEx from "@ar-js-org/ar.js/three.js/build/ar-threex.js"
 import Soldier from "../models/soldier"
@@ -8,7 +11,8 @@ THREEx.ArToolkitContext.baseURL = "/"
 export default class extends Controller {
   static values = {
     armies: Object,
-    currentuser: String
+    currentuser: String,
+    gameId: Number
   }
   static targets = ['move', 'attack', 'defense', 'settingMenu']
 
@@ -29,9 +33,17 @@ export default class extends Controller {
       attack: this.attackTarget, 
       defense: this.defenseTarget
     }
-    console.log(Object.keys(this.armiesValue)[0], this.currentuserValue);
+    
+    // define initial turn
     this.turn = this.currentuserValue == Object.keys(this.armiesValue)[0] ? 'move' : 'defense'
     this.updateStepControls()
+
+    // initialize websocket
+    this.channel = createConsumer().subscriptions.create(
+      { channel: "GameChannel", id: this.gameIdValue },
+      { received: data => console.log(data) }
+    )
+    console.log(`Subscribed to the game with the id ${this.gameIdValue}.`)
 
     this.initARJS()
   }
