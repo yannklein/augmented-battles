@@ -52,10 +52,13 @@
   }
   .game-setting-menu {
     &.active {
-      display: block;
+      height: fit-content;
+      padding: 16px 16px;
     }
-    display: none;
-    padding: 16px;
+    transition: 0.3s;
+    padding: 0px 16px;
+    height: 0px;
+    overflow: hidden;
     list-style: none;
     background-color: white;
     width: 120px;

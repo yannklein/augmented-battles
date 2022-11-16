@@ -24,11 +24,11 @@
     <% end %>
   </div>
   <div class="game-setting">
-    <ul class="game-setting-menu active">
+    <ul class="game-setting-menu" data-game-target="settingMenu">
       <li><%= link_to "Profil", game_path(@game) %></li>
       <li><%= link_to "Back", game_path(@game) %></li>
     </ul>
-    <a href="#"><i class="fa-solid fa-gear"></i></a>
+    <a href="#" data-action="click->game#openSetting:prevent"><i class="fa-solid fa-gear"></i></a>
   </div>
   <div class="game-ctrl">
     <div data-game-target="move" class="game-ctrl-msg active">

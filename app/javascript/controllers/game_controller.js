@@ -10,7 +10,7 @@ export default class extends Controller {
     armies: Object,
     currentUser: String
   }
-  static targets = ['move', 'attack', 'defense']
+  static targets = ['move', 'attack', 'defense', 'settingMenu']
 
   connect() {
     console.log(this.armiesValue)
@@ -46,6 +46,10 @@ export default class extends Controller {
   updateStepControls() {
     Object.values(this.stepControls).forEach(stepTarget => stepTarget.classList.remove("active"))
     this.stepControls[this.turn].classList.add("active")
+  }
+
+  openSetting() {
+    this.settingMenuTarget.classList.toggle("active")
   }
 
   initARJS() {
