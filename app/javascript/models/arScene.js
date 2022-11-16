@@ -187,7 +187,7 @@ export default class ArScene {
       cameraParametersUrl: THREEx.ArToolkitContext.baseURL + "camera_para.dat",
       detectionMode: "mono",
       canvasWidth: window.innerWidth,
-      canvasHeight: window.innerWidth,
+      canvasHeight: window.innerHeight,
     });
     // initialize it
     arToolkitContext.init(() => {
