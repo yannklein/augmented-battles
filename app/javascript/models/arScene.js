@@ -1,40 +1,39 @@
-import * as THREE from "three"
-import * as THREEx from "@ar-js-org/ar.js/three.js/build/ar-threex.js"
-import Soldier from "../models/soldier"
+import * as THREE from "three";
+import * as THREEx from "@ar-js-org/ar.js/three.js/build/ar-threex.js";
+import Soldier from "../models/soldier";
 
-THREEx.ArToolkitContext.baseURL = "/"
-
+THREEx.ArToolkitContext.baseURL = "/";
 
 export default class ArScene {
-  constructor(container, armiesInfo) {
-    this.imageMarkerFolder = "/characters/markers/"
-    this.imageMarkers = ["m1", "m2", "m3", "m4", "m5", "m6"]
+  constructor(container, armiesInfo, currentUser) {
+    this.imageMarkerFolder = "/characters/markers/";
+    this.imageMarkers = ["m1", "m2", "m3", "m4", "m5", "m6"];
 
     // raycasting variables
-    this.container = container
-    this.pointer = new THREE.Vector2()
-    this.pointer.x = 0
-    this.pointer.y = 0
-    this.raycaster = new THREE.Raycaster()
+    this.container = container;
+    this.pointer = new THREE.Vector2(0,0);
+    this.raycaster = new THREE.Raycaster();
 
-    this.armiesInfo = armiesInfo
-    this.soldiers = []
-    this.markers = []
+    this.armiesInfo = armiesInfo;
+    this.currentUser = currentUser
+    this.soldiers = [];
+    this.soldierSelected = false
+    this.markers = [];
 
-    this.initScene()
+    this.initScene();
   }
 
-  createStuffs(){
-    console.log(this);
-    
-    let markerIndex = 0
+  createStuffs() {
+    let markerIndex = 0;
     Object.keys(this.armiesInfo).forEach((player) => {
-      this.armiesInfo[player]['army'].forEach((soldier) => {
-        const markerRoot = this.markers[markerIndex]
-        this.soldiers.push(new Soldier(soldier, this.armiesInfo[player]['color'], markerRoot))
-        markerIndex += 1
-      })
-    })
+      this.armiesInfo[player]["army"].forEach((soldier) => {
+        const markerRoot = this.markers[markerIndex];
+        this.soldiers.push(
+          new Soldier(player, soldier, this.armiesInfo[player]["color"], markerRoot)
+        );
+        markerIndex += 1;
+      });
+    });
   }
 
   initScene(callback) {
@@ -126,7 +125,7 @@ export default class ArScene {
       arToolkitContext.update(arToolkitSource.domElement);
     });
 
-    this.createStuffs()
+    this.createStuffs();
 
     //////////////////////////////////////////////////////////////////////////////////
     //		render the whole thing on the page
@@ -136,9 +135,6 @@ export default class ArScene {
     onRenderFcts.push(() => {
       this.renderer.render(this.scene, this.camera);
     });
-
-    // Listen to mouse move for Raycasting
-    window.addEventListener("click", this.onSelect.bind(this));
 
     // run the rendering loop
     var lastTimeMsec = null;
@@ -212,28 +208,83 @@ export default class ArScene {
     return arToolkitContext;
   }
 
-    onSelect(event) {
+  onSelect(turn, event) {
+    // if defense mode no selection possible
+    if (turn == 'defense') {
+      return
+    }
+
     // calculate pointer position in normalized device coordinates
     // (-1 to +1) for both components
-    this.pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1
-    this.pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1
+    this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    this.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
     // update the picking ray with the camera and pointer position
-    this.raycaster.setFromCamera( this.pointer, this.camera )
+    this.raycaster.setFromCamera(this.pointer, this.camera);
 
     // calculate objects intersecting the picking ray
-    const intersects = this.raycaster.intersectObjects( this.markers.map( marker => marker.base) )
+    const intersects = this.raycaster.intersectObjects(
+      this.markers.map((marker) => marker.base)
+    );
 
     // unselect all soldiers
-    this.soldiers.forEach(soldier => soldier.unselect())
-    // select the intersecting soldier
+    this.soldiers.forEach((soldier) => soldier.unselect());
+    //iterate over all the intersected objects
     intersects.forEach((intersect) => {
-      const soldier = this.soldiers.find(sold => {
-        console.log(sold.marker, intersect.object.marker)
-        return sold.marker === intersect.object.marker
-      })
-      console.log(soldier)
-      soldier?.select()
-    })
+      // retrieve the intersecting soldier
+      const soldier = this.soldiers.find(sold => sold.marker === intersect.object.marker);
+
+      // unselect all and return if no soldier selected
+      if (!soldier) {
+        this.soldiers.forEach((soldier) => soldier.unselect());
+        this.soldierSelected = false;
+        return
+      }
+
+      // check actions
+      switch (turn) {
+        case 'move':
+          // if current player's soldier, select and move it
+          if (soldier.player != this.currentUser) {
+            this.soldiers.forEach((soldier) => soldier.unselect());
+            soldier.select();
+            this.soldierSelected = true;
+            soldier.move();
+          }
+          break;
+        case 'attack':
+          // if current player's soldier, select it
+          if (soldier.player == this.currentUser) {
+            soldier.select();
+            this.soldierSelected = true;
+          } 
+          // if opponent player and own soldier selected, attack!
+          else if (this.soldierSelected) {
+            soldier.attack();
+            soldier.unselect();
+            this.soldierSelected = false;
+          }
+          break;
+      
+        default:
+          break;
+      }
+
+      // unselect all and return if soldier not from current user
+      if (soldier.player != this.currentUser) {
+        this.soldiers.forEach((soldier) => soldier.unselect());
+        return
+      }
+      // select if unselected
+      if (!soldier.selected) {
+        this.soldiers.forEach((soldier) => soldier.unselect());
+        soldier.select();
+      }
+      // if soldier already selected
+      if (soldier.selected) {
+        // if move mode, unable soldier to move
+        soldier.move();
+      }
+    });
   }
 }

@@ -3,27 +3,41 @@ import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
 import porcelainImg from "/public/matcap-porcelain-white.jpg";
 
 export default class Soldier {
-  constructor(soldier, color, marker) {
-    this.soldier = soldier;
-    this.color = parseInt(color,16);
-    this.marker = marker;
-    this.imageAssetUrl = "/characters/3dAssets/";
-    this.porcelainImg = porcelainImg;
-    this.createSoldier();
+  constructor(player, soldier, color, marker) {
+    this.selected = false
+    this.player = player
+    this.soldier = soldier
+    this.color = parseInt(color,16)
+    this.marker = marker
+    this.imageAssetUrl = "/characters/3dAssets/"
+    this.porcelainImg = porcelainImg
+    this.createSoldier()
   }
 
   select() {
-    this.range.material.opacity = 0.5;
     this.base.material.opacity = 0.5;
+    this.selected = true
+    this.range
   }
 
   unselect() {
-    this.range.material.opacity = 0.1;
     this.base.material.opacity = 0.1;
+    this.selected = false
+    this.soldierGroup.remove(this.range);
+  }
+
+  move() {
+    console.log('move!');
+    this.range = this.createRange();
+    this.soldierGroup.add(this.range);
+  }
+
+  attack() {
+    console.log('attack!');
   }
 
   createBase() {
-    const geometry = new THREE.PlaneGeometry(1, 1);
+    const geometry = new THREE.PlaneGeometry(1.2, 1.2);
     const material = new THREE.MeshBasicMaterial({
       color: this.color,
       transparent: true,
@@ -78,19 +92,12 @@ export default class Soldier {
     });
   }
 
-  // createSelectFeature() {
-    
-  // }
-
   createSoldier() {
     this.soldierGroup = new THREE.Group();
     this.soldierGroup.name = this.soldier.name;
 
     this.base = this.createBase();
     this.soldierGroup.add(this.base);
-
-    this.range = this.createRange();
-    this.soldierGroup.add(this.range);
 
     this.createAsset((asset) => {
       this.soldierGroup.add(asset);

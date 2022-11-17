@@ -34,7 +34,10 @@ export default class extends Controller {
     )
     console.log(`Subscribed to the game with the id ${this.gameIdValue}.`)
 
-    new ArScene(this.element, this.armiesValue)
+    this.arScene = new ArScene(this.element, this.armiesValue, this.currentUserValue)
+
+    // Listen to click on the scene
+    window.addEventListener("click", this.arScene.onSelect.bind(this.arScene, this.turn));
   }
 
   setTurnPlayer(player) {
