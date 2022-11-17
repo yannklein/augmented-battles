@@ -15,13 +15,13 @@ export default class Soldier {
   }
 
   select() {
-    this.base.material.opacity = 0.5;
+    // this.base.material.opacity = 0.5;
     this.selected = true
     this.range
   }
 
   unselect() {
-    this.base.material.opacity = 0.1;
+    // this.base.material.opacity = 0.1;
     this.selected = false
     this.soldierGroup.remove(this.range);
   }
@@ -37,15 +37,15 @@ export default class Soldier {
   }
 
   createBase() {
-    const geometry = new THREE.PlaneGeometry(1.2, 1.2);
+    const geometry = new THREE.PlaneGeometry(1.4, 1.4);
     const material = new THREE.MeshBasicMaterial({
       color: this.color,
-      transparent: true,
-      opacity: 0.1,
+      // transparent: true,
+      // opacity: 0.1,
     });
 
     const plane = new THREE.Mesh(geometry, material);
-    plane.position.z = 0.05;
+    // plane.position.z = 0.05;
     plane.marker = this.marker;
     this.marker.base = plane;
     return plane;
@@ -57,7 +57,7 @@ export default class Soldier {
       new THREE.MeshBasicMaterial({
         color: this.color,
         transparent: true,
-        opacity: 0.1,
+        opacity: 0.5,
       })
     );
     circle.marker = this.marker;
@@ -142,9 +142,10 @@ export default class Soldier {
       material
     );
 
-    mesh.position.y = -1;
-    mesh.position.z = 0.1;
+    mesh.position.y = 0;
+    mesh.position.z = 2;
     mesh.position.x = 0;
+    mesh.rotation.x = Math.PI/2;
     return mesh;
   }
 
