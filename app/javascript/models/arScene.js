@@ -81,6 +81,9 @@ export default class ArScene {
       const markerRoot = new THREE.Group();
       markerRoot.name = imageMarker;
       markerRoot.isMarker = true;
+      markerRoot.position.x = 999;
+      markerRoot.position.y = 999;
+      markerRoot.position.z = 999;
       this.scene.add(markerRoot);
       this.markers.push(markerRoot);
     });
@@ -215,21 +218,14 @@ export default class ArScene {
   }
 
   performAction(soldier, turn) {
-    // unselect all and return if no soldier selected
-    if (!soldier) {
-      this.soldiers.forEach((soldier) => soldier.unselect());
-      this.soldierSelected = false;
-      console.log("unselect all");
-      return;
-    }
 
     // check actions
     switch (turn) {
       case "move":
         console.log("start move action");
         // if current player's soldier, select and move it
-        if (soldier.player != this.currentUser && !this.soldierSelected) {
-          this.soldiers.forEach((soldier) => soldier.unselect());
+        if (soldier.player == this.currentUser) {
+          this.soldiers.forEach(soldier => soldier.unselect());
           soldier.select();
           soldier.move();
           this.soldierSelected = true;
@@ -271,20 +267,19 @@ export default class ArScene {
     this.raycaster.setFromCamera(this.pointer, this.camera);
 
     // calculate objects intersecting the picking ray
-    const intersects = this.raycaster.intersectObjects(
-      this.markers.map((marker) => marker.base)
-    );
+    const intersects = this.raycaster.intersectObjects(this.markers);
 
-    //iterate over all the intersected objects
-    // intersects.forEach((intersect) => {
-    // });
-
+    // unselect all and return if no soldier selected
+    if (intersects.length == 0) {
+      this.soldiers.forEach(soldier => soldier.unselect());
+      this.soldierSelected = false;
+      console.log("unselect all");
+      return;
+    }
+    
     // retrieve the intersecting soldier
-    const currentMarker = intersects.find(inters => inters?.object.marker)?.object.marker;
-    console.log(currentMarker);
-    const soldier = this.soldiers.find( sold => sold.marker === currentMarker)
-    console.log(soldier);
-
-    this.performAction(soldier, turn)
+    // intersects is an array of JS obj with a key object containing the soldier part (base or asset)
+    const intersectedSoldierPart = intersects.find(inters => inters.object.marker).object;
+    this.performAction(intersectedSoldierPart.soldier, turn)
   }
 }

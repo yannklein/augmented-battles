@@ -27,12 +27,13 @@ export default class Soldier {
   
   move() {
     console.log('move!');
+    this.marker.parent.remove(this.range);
     this.range = this.createRange();
-    this.marker.parent.add(this.range);
     this.range.position.x = this.marker.position.x
     this.range.position.y = this.marker.position.y
     this.range.position.z = this.marker.position.z
-    window.soldier = this;
+    this.range.quaternion.copy(this.marker.quaternion)
+    this.marker.parent.add(this.range);
   }
 
   attack() {
@@ -50,21 +51,25 @@ export default class Soldier {
     const plane = new THREE.Mesh(geometry, material);
     // plane.position.z = 0.05;
     plane.marker = this.marker;
-    this.marker.base = plane;
+    plane.soldier = this;
     return plane;
   }
 
   createRange() {
+    const circleGroup = new THREE.Group()
     const circle = new THREE.Mesh(
       new THREE.CircleGeometry(this.soldier.max_distance / 5, 32),
       new THREE.MeshBasicMaterial({
+        side: THREE.DoubleSide,
         color: this.color,
         transparent: true,
         opacity: 0.5,
       })
     );
     circle.marker = this.marker;
-    return circle;
+    circle.rotation.x += Math.PI / 2
+    circleGroup.add(circle)
+    return circleGroup;
   }
 
   createAsset(callback) {
@@ -83,6 +88,7 @@ export default class Soldier {
           mesh.scale.set(0.05, 0.05, 0.05);
           mesh.position.z = 0.1;
           mesh.marker = this.marker;
+          mesh.soldier = this;
           callback(mesh);
         },
         (xhr) => {
