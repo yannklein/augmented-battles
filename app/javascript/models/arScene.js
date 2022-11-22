@@ -11,13 +11,13 @@ export default class ArScene {
 
     // raycasting variables
     this.container = container;
-    this.pointer = new THREE.Vector2(0,0);
+    this.pointer = new THREE.Vector2(0, 0);
     this.raycaster = new THREE.Raycaster();
 
     this.armiesInfo = armiesInfo;
-    this.currentUser = currentUser
+    this.currentUser = currentUser;
     this.soldiers = [];
-    this.soldierSelected = false
+    this.soldierSelected = false;
     this.markers = [];
 
     this.initScene();
@@ -29,7 +29,12 @@ export default class ArScene {
       this.armiesInfo[player]["army"].forEach((soldier) => {
         const markerRoot = this.markers[markerIndex];
         this.soldiers.push(
-          new Soldier(player, soldier, this.armiesInfo[player]["color"], markerRoot)
+          new Soldier(
+            player,
+            soldier,
+            this.armiesInfo[player]["color"],
+            markerRoot
+          )
         );
         markerIndex += 1;
       });
@@ -75,6 +80,7 @@ export default class ArScene {
     this.imageMarkers.forEach((imageMarker) => {
       const markerRoot = new THREE.Group();
       markerRoot.name = imageMarker;
+      markerRoot.isMarker = true;
       this.scene.add(markerRoot);
       this.markers.push(markerRoot);
     });
@@ -208,10 +214,52 @@ export default class ArScene {
     return arToolkitContext;
   }
 
+  performAction(soldier, turn) {
+    // unselect all and return if no soldier selected
+    if (!soldier) {
+      this.soldiers.forEach((soldier) => soldier.unselect());
+      this.soldierSelected = false;
+      console.log("unselect all");
+      return;
+    }
+
+    // check actions
+    switch (turn) {
+      case "move":
+        console.log("start move action");
+        // if current player's soldier, select and move it
+        if (soldier.player != this.currentUser && !this.soldierSelected) {
+          this.soldiers.forEach((soldier) => soldier.unselect());
+          soldier.select();
+          soldier.move();
+          this.soldierSelected = true;
+        }
+        break;
+      case "attack":
+        console.log("start attack action");
+        // if current player's soldier, select it
+        if (soldier.player == this.currentUser) {
+          soldier.select();
+          this.soldierSelected = true;
+        }
+        // if opponent player and own soldier selected, attack!
+        else if (this.soldierSelected) {
+          soldier.attack();
+          soldier.unselect();
+          this.soldierSelected = false;
+        }
+        break;
+
+      default:
+        console.log("no action");
+        break;
+    }
+  }
+
   onSelect(turn, event) {
     // if defense mode no selection possible
-    if (turn == 'defense') {
-      return
+    if (turn == "defense") {
+      return;
     }
 
     // calculate pointer position in normalized device coordinates
@@ -227,64 +275,16 @@ export default class ArScene {
       this.markers.map((marker) => marker.base)
     );
 
-    // unselect all soldiers
-    this.soldiers.forEach((soldier) => soldier.unselect());
     //iterate over all the intersected objects
-    intersects.forEach((intersect) => {
-      // retrieve the intersecting soldier
-      const soldier = this.soldiers.find(sold => sold.marker === intersect.object.marker);
+    // intersects.forEach((intersect) => {
+    // });
 
-      // unselect all and return if no soldier selected
-      if (!soldier) {
-        this.soldiers.forEach((soldier) => soldier.unselect());
-        this.soldierSelected = false;
-        return
-      }
+    // retrieve the intersecting soldier
+    const currentMarker = intersects.find(inters => inters?.object.marker)?.object.marker;
+    console.log(currentMarker);
+    const soldier = this.soldiers.find( sold => sold.marker === currentMarker)
+    console.log(soldier);
 
-      // check actions
-      switch (turn) {
-        case 'move':
-          // if current player's soldier, select and move it
-          if (soldier.player != this.currentUser) {
-            this.soldiers.forEach((soldier) => soldier.unselect());
-            soldier.select();
-            this.soldierSelected = true;
-            soldier.move();
-          }
-          break;
-        case 'attack':
-          // if current player's soldier, select it
-          if (soldier.player == this.currentUser) {
-            soldier.select();
-            this.soldierSelected = true;
-          } 
-          // if opponent player and own soldier selected, attack!
-          else if (this.soldierSelected) {
-            soldier.attack();
-            soldier.unselect();
-            this.soldierSelected = false;
-          }
-          break;
-      
-        default:
-          break;
-      }
-
-      // unselect all and return if soldier not from current user
-      if (soldier.player != this.currentUser) {
-        this.soldiers.forEach((soldier) => soldier.unselect());
-        return
-      }
-      // select if unselected
-      if (!soldier.selected) {
-        this.soldiers.forEach((soldier) => soldier.unselect());
-        soldier.select();
-      }
-      // if soldier already selected
-      if (soldier.selected) {
-        // if move mode, unable soldier to move
-        soldier.move();
-      }
-    });
+    this.performAction(soldier, turn)
   }
 }

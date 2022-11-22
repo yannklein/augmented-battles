@@ -13,23 +13,26 @@ export default class Soldier {
     this.porcelainImg = porcelainImg
     this.createSoldier()
   }
-
+  
   select() {
     // this.base.material.opacity = 0.5;
     this.selected = true
-    this.range
   }
-
+  
   unselect() {
     // this.base.material.opacity = 0.1;
     this.selected = false
-    this.soldierGroup.remove(this.range);
+    this.marker.parent.remove(this.range);
   }
-
+  
   move() {
     console.log('move!');
     this.range = this.createRange();
-    this.soldierGroup.add(this.range);
+    this.marker.parent.add(this.range);
+    this.range.position.x = this.marker.position.x
+    this.range.position.y = this.marker.position.y
+    this.range.position.z = this.marker.position.z
+    window.soldier = this;
   }
 
   attack() {
