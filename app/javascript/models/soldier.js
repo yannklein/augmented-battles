@@ -58,7 +58,7 @@ export default class Soldier {
   createRange() {
     const circleGroup = new THREE.Group()
     const circle = new THREE.Mesh(
-      new THREE.CircleGeometry(this.soldier.max_distance / 5, 32),
+      new THREE.CircleGeometry(this.soldier.max_distance / 2, 32),
       new THREE.MeshBasicMaterial({
         side: THREE.DoubleSide,
         color: this.color,
