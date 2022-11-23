@@ -5,7 +5,7 @@ import Soldier from "../models/soldier";
 THREEx.ArToolkitContext.baseURL = "/";
 
 export default class ArScene {
-  constructor(container, armiesInfo, currentUser) {
+  constructor(container, armiesInfo, currentUser, stepControls) {
     this.imageMarkerFolder = "/characters/markers/";
     this.imageMarkers = ["m1", "m2", "m3", "m4", "m5", "m6"];
 
@@ -16,6 +16,7 @@ export default class ArScene {
 
     this.armiesInfo = armiesInfo;
     this.currentUser = currentUser;
+    this.stepControls = stepControls;
     this.soldiers = [];
     this.soldierSelected = false;
     this.markers = [];
@@ -217,9 +218,10 @@ export default class ArScene {
     return arToolkitContext;
   }
 
-  performAction(soldier, turn) {
+  performAction(turn, soldier) {
 
     // check actions
+    console.log(turn);
     switch (turn) {
       case "move":
         console.log("start move action");
@@ -227,7 +229,7 @@ export default class ArScene {
         if (soldier.player == this.currentUser) {
           this.soldiers.forEach(soldier => soldier.unselect());
           soldier.select();
-          soldier.move();
+          soldier.showMoveRange();
           this.soldierSelected = true;
         }
         break;
@@ -236,13 +238,15 @@ export default class ArScene {
         // if current player's soldier, select it
         if (soldier.player == this.currentUser) {
           soldier.select();
+          soldier.showAttackRange();
           this.soldierSelected = true;
         }
         // if opponent player and own soldier selected, attack!
         else if (this.soldierSelected) {
           soldier.attack();
-          soldier.unselect();
-          this.soldierSelected = false;
+          soldier.select();
+          this.stepControls.fight.classList.add('active')
+          this.stepControls.attack.classList.remove('active')
         }
         break;
 
@@ -253,6 +257,7 @@ export default class ArScene {
   }
 
   onSelect(turn, event) {
+    console.log(turn);
     // if defense mode no selection possible
     if (turn == "defense") {
       return;
@@ -271,15 +276,19 @@ export default class ArScene {
 
     // unselect all and return if no soldier selected
     if (intersects.length == 0) {
-      this.soldiers.forEach(soldier => soldier.unselect());
-      this.soldierSelected = false;
-      console.log("unselect all");
+      this.unSelectAll()
       return;
     }
     
     // retrieve the intersecting soldier
     // intersects is an array of JS obj with a key object containing the soldier part (base or asset)
     const intersectedSoldierPart = intersects.find(inters => inters.object.marker).object;
-    this.performAction(intersectedSoldierPart.soldier, turn)
+    this.performAction(turn, intersectedSoldierPart.soldier)
+  }
+
+  unSelectAll() {
+    this.soldiers.forEach(soldier => soldier.unselect());
+    this.soldierSelected = false;
+    console.log("unselect all");
   }
 }

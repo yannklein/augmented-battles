@@ -4,48 +4,78 @@ import porcelainImg from "/public/matcap-porcelain-white.jpg";
 
 export default class Soldier {
   constructor(player, soldier, color, marker) {
-    this.selected = false
-    this.player = player
-    this.soldier = soldier
-    this.color = parseInt(color,16)
-    this.marker = marker
-    this.imageAssetUrl = "/characters/3dAssets/"
-    this.porcelainImg = porcelainImg
-    this.createSoldier()
+    this.selected = false;
+    this.player = player;
+    this.soldier = soldier;
+    this.color = parseInt(color, 16);
+    this.marker = marker;
+    this.imageAssetUrl = "/characters/3dAssets/";
+    this.porcelainImg = porcelainImg;
+    this.createSoldier();
   }
-  
+
   select() {
-    // this.base.material.opacity = 0.5;
-    this.selected = true
+    // this.base.material.opacity = 1;
+    this.selectCircle = new THREE.Mesh(
+      new THREE.RingGeometry(1, 1.2, 32),
+      new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        side: THREE.DoubleSide,
+      })
+    );
+    this.selectCircle.marker = this.marker;
+    this.selectCircle.rotation.x += Math.PI / 2;
+    this.marker.add(this.selectCircle);
+    this.selected = true;
   }
-  
+
   unselect() {
     // this.base.material.opacity = 0.1;
-    this.selected = false
+    this.selected = false;
+    // remove range/selection circle wherever it is
     this.marker.parent.remove(this.range);
+    this.marker.remove(this.range);
+    this.marker.remove(this.selectCircle);
   }
-  
-  move() {
-    console.log('move!');
+
+  showAttackRange() {
+    this.range = new THREE.Mesh(
+      new THREE.RingGeometry(
+        this.soldier.max_distance,
+        this.soldier.max_distance + 0.3,
+        32
+      ),
+      new THREE.MeshBasicMaterial({
+        color: this.color,
+        side: THREE.DoubleSide,
+      })
+    );
+    this.range.marker = this.marker;
+    this.range.rotation.x += Math.PI / 2;
+    this.marker.add(this.range);
+  }
+
+  showMoveRange() {
+    console.log("move!");
     this.marker.parent.remove(this.range);
-    this.range = this.createRange();
-    this.range.position.x = this.marker.position.x
-    this.range.position.y = this.marker.position.y
-    this.range.position.z = this.marker.position.z
-    this.range.quaternion.copy(this.marker.quaternion)
+    this.range = this.createMoveRange();
+    this.range.position.x = this.marker.position.x;
+    this.range.position.y = this.marker.position.y;
+    this.range.position.z = this.marker.position.z;
+    this.range.quaternion.copy(this.marker.quaternion);
     this.marker.parent.add(this.range);
   }
 
   attack() {
-    console.log('attack!');
+    console.log("attack!");
   }
 
   createBase() {
-    const geometry = new THREE.CircleGeometry(0.6, 32);
+    const geometry = new THREE.CircleGeometry(1, 32);
     const material = new THREE.MeshBasicMaterial({
       color: this.color,
       // transparent: true,
-      // opacity: 0.1,
+      // opacity: 0.8,
     });
 
     const plane = new THREE.Mesh(geometry, material);
@@ -55,10 +85,10 @@ export default class Soldier {
     return plane;
   }
 
-  createRange() {
-    const circleGroup = new THREE.Group()
+  createMoveRange() {
+    const circleGroup = new THREE.Group();
     const circle = new THREE.Mesh(
-      new THREE.CircleGeometry(this.soldier.max_distance / 2, 32),
+      new THREE.CircleGeometry(this.soldier.speed / 2, 32),
       new THREE.MeshBasicMaterial({
         side: THREE.DoubleSide,
         color: this.color,
@@ -67,8 +97,8 @@ export default class Soldier {
       })
     );
     circle.marker = this.marker;
-    circle.rotation.x += Math.PI / 2
-    circleGroup.add(circle)
+    circle.rotation.x += Math.PI / 2;
+    circleGroup.add(circle);
     return circleGroup;
   }
 
@@ -154,7 +184,7 @@ export default class Soldier {
     mesh.position.y = 0;
     mesh.position.z = 2;
     mesh.position.x = 0;
-    mesh.rotation.x = Math.PI/2;
+    mesh.rotation.x = Math.PI / 2;
     return mesh;
   }
 

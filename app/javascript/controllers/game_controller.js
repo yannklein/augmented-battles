@@ -11,7 +11,7 @@ export default class extends Controller {
     turnUser: String,
     gameId: Number
   }
-  static targets = ['move', 'attack', 'defense', 'settingMenu', 'score']
+  static targets = ['move', 'attack', 'defense', 'fight', 'settingMenu', 'score']
 
   connect() {
     console.log(this.armiesValue)
@@ -20,7 +20,8 @@ export default class extends Controller {
     this.stepControls = {
       move: this.moveTarget, 
       attack: this.attackTarget, 
-      defense: this.defenseTarget
+      defense: this.defenseTarget,
+      fight: this.fightTarget
     }
     
     // define initial turn
@@ -34,10 +35,12 @@ export default class extends Controller {
     )
     console.log(`Subscribed to the game with the id ${this.gameIdValue}.`)
 
-    this.arScene = new ArScene(this.element, this.armiesValue, this.currentUserValue)
+    this.arScene = new ArScene(this.element, this.armiesValue, this.currentUserValue, this.stepControls)
 
     // Listen to click on the scene
-    window.addEventListener("click", this.arScene.onSelect.bind(this.arScene, this.turn));
+    window.addEventListener("click", (event) => {
+      this.arScene.onSelect(this.turn, event)
+    });
   }
 
   setTurnPlayer(player) {
@@ -58,6 +61,7 @@ export default class extends Controller {
   endTurn() {
     const url = `/games/${this.gameIdValue}/next_turn`
     fetch(url)
+    this.arScene.unSelectAll()
   }
 
   nextTurn() {
