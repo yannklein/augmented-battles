@@ -71,19 +71,8 @@ export default class Soldier {
 
   attack(otherSoldier) {
     console.log("attack!");
-    const dir = new THREE.Vector3(...Object.values(otherSoldier.marker.position));
-
-    //normalize the direction vector (convert to vector of length 1)
-    // dir.normalize();
-
-    // const origin = new THREE.Vector3(...Object.values(this.marker.position));
-    // const length = origin.distanceTo(dir) * 0.8;
-    // const hex = this.color;
-
-    // this.arrowAttack = new THREE.ArrowHelper( dir, origin, length, hex );
     this.arrowAttack = this.createArrow(otherSoldier);
-    this.marker.parent.add( this.arrowAttack );
-    window.arrow = this.arrowAttack
+    this.marker.add( this.arrowAttack );
   }
 
   createArrow(otherSoldier) {
@@ -95,21 +84,38 @@ export default class Soldier {
     const arrowMesh = new THREE.Mesh(arrowGeo, arrowMat);
     arrowMesh.rotation.x = Math.PI / 2;
     arrowMesh.position.z = 0.25;
+    arrowMesh.position.y = 0.5;
     group.add(arrowMesh);
     
     const cylinderGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.5, 32);
     const cylinderMesh = new THREE.Mesh(cylinderGeo, arrowMat);
     cylinderMesh.rotation.x = Math.PI / 2;
     cylinderMesh.position.z = -0.25;
+    cylinderMesh.position.y = 0.5;
     group.add(cylinderMesh);
-    // group.lookAt(this.getPosition(otherSoldier.marker));
-    group.position.copy(this.getMiddle(this.marker, otherSoldier.marker));
-    // group.position.copy(this.marker.position)
+    group.position.copy(this.getMiddleFromRef(otherSoldier.marker, this.marker));
+    group.lookAt(this.getPositionFromRef(otherSoldier.marker, this.marker));
     return group;
   }
 
   getPosition(object) {
     return new THREE.Vector3(...Object.values(object.position))
+  }
+
+  getPositionFromRef(object ,referential) {
+    return new THREE.Vector3(
+      object.position.x - referential.position.x,
+      object.position.y - referential.position.y,
+      object.position.z - referential.position.z
+    )
+  }
+
+  getMiddleFromRef(object ,referential) {
+    return new THREE.Vector3(
+      (object.position.x - referential.position.x) / 2,
+      (object.position.y - referential.position.y) / 2,
+      (object.position.z - referential.position.z) / 2
+    )
   }
 
   getMiddle(object1, object2) {
