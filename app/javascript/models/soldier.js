@@ -41,7 +41,7 @@ export default class Soldier {
   }
 
   createBase() {
-    const geometry = new THREE.PlaneGeometry(1.4, 1.4);
+    const geometry = new THREE.CircleGeometry(0.6, 32);
     const material = new THREE.MeshBasicMaterial({
       color: this.color,
       // transparent: true,
