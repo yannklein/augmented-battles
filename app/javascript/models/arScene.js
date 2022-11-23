@@ -18,7 +18,7 @@ export default class ArScene {
     this.currentUser = currentUser;
     this.stepControls = stepControls;
     this.soldiers = [];
-    this.soldierSelected = false;
+    this.soldierSelected;
     this.markers = [];
 
     this.initScene();
@@ -76,6 +76,10 @@ export default class ArScene {
       1000
     );
     this.scene.add(this.camera);
+
+    // Add a basic light
+    const light = new THREE.AmbientLight( 0x404040, 4 ); // soft white light
+    this.scene.add( light );
 
     // Create the marker roots
     this.imageMarkers.forEach((imageMarker) => {
@@ -230,7 +234,7 @@ export default class ArScene {
           this.soldiers.forEach(soldier => soldier.unselect());
           soldier.select();
           soldier.showMoveRange();
-          this.soldierSelected = true;
+          this.soldierSelected = soldier;
         }
         break;
       case "attack":
@@ -239,12 +243,12 @@ export default class ArScene {
         if (soldier.player == this.currentUser) {
           soldier.select();
           soldier.showAttackRange();
-          this.soldierSelected = true;
+          this.soldierSelected = soldier;
         }
         // if opponent player and own soldier selected, attack!
         else if (this.soldierSelected) {
-          soldier.attack();
           soldier.select();
+          this.soldierSelected.attack(soldier);
           this.stepControls.fight.classList.add('active')
           this.stepControls.attack.classList.remove('active')
         }
@@ -288,7 +292,7 @@ export default class ArScene {
 
   unSelectAll() {
     this.soldiers.forEach(soldier => soldier.unselect());
-    this.soldierSelected = false;
+    this.soldierSelected = null;
     console.log("unselect all");
   }
 }

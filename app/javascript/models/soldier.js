@@ -25,6 +25,7 @@ export default class Soldier {
     );
     this.selectCircle.marker = this.marker;
     this.selectCircle.rotation.x += Math.PI / 2;
+    // this.selectCircle.position.z = 0.2;
     this.marker.add(this.selectCircle);
     this.selected = true;
   }
@@ -36,6 +37,8 @@ export default class Soldier {
     this.marker.parent.remove(this.range);
     this.marker.remove(this.range);
     this.marker.remove(this.selectCircle);
+    this.marker.remove( this.arrowAttack );
+
   }
 
   showAttackRange() {
@@ -66,9 +69,59 @@ export default class Soldier {
     this.marker.parent.add(this.range);
   }
 
-  attack() {
+  attack(otherSoldier) {
     console.log("attack!");
+    const dir = new THREE.Vector3(...Object.values(otherSoldier.marker.position));
+
+    //normalize the direction vector (convert to vector of length 1)
+    // dir.normalize();
+
+    // const origin = new THREE.Vector3(...Object.values(this.marker.position));
+    // const length = origin.distanceTo(dir) * 0.8;
+    // const hex = this.color;
+
+    // this.arrowAttack = new THREE.ArrowHelper( dir, origin, length, hex );
+    this.arrowAttack = this.createArrow(otherSoldier);
+    this.marker.parent.add( this.arrowAttack );
+    window.arrow = this.arrowAttack
   }
+
+  createArrow(otherSoldier) {
+    console.log("arrow");
+    const group = new THREE.Group();
+    
+    const arrowMat = new THREE.MeshLambertMaterial({color: 0xff9900})
+    const arrowGeo = new THREE.ConeGeometry(0.2, 0.5, 32);
+    const arrowMesh = new THREE.Mesh(arrowGeo, arrowMat);
+    arrowMesh.rotation.x = Math.PI / 2;
+    arrowMesh.position.z = 0.25;
+    group.add(arrowMesh);
+    
+    const cylinderGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.5, 32);
+    const cylinderMesh = new THREE.Mesh(cylinderGeo, arrowMat);
+    cylinderMesh.rotation.x = Math.PI / 2;
+    cylinderMesh.position.z = -0.25;
+    group.add(cylinderMesh);
+    // group.lookAt(this.getPosition(otherSoldier.marker));
+    group.position.copy(this.getMiddle(this.marker, otherSoldier.marker));
+    // group.position.copy(this.marker.position)
+    return group;
+  }
+
+  getPosition(object) {
+    return new THREE.Vector3(...Object.values(object.position))
+  }
+
+  getMiddle(object1, object2) {
+    const scalarMiddle = (x1, x2) => Math.min(x1, x2) + Math.abs(x1 - x2) / 2
+    return new THREE.Vector3(
+      scalarMiddle(object1.position.x, object2.position.x),
+      scalarMiddle(object1.position.y, object2.position.y),
+      scalarMiddle(object1.position.z, object2.position.z)
+    )
+  }
+
+
 
   createBase() {
     const geometry = new THREE.CircleGeometry(1, 32);
