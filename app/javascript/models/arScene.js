@@ -78,7 +78,7 @@ export default class ArScene {
     this.scene.add(this.camera);
 
     // Add a basic light
-    const light = new THREE.AmbientLight( 0x404040, 4 ); // soft white light
+    const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
     this.scene.add( light );
 
     // Create the marker roots
@@ -241,12 +241,23 @@ export default class ArScene {
         console.log("start attack action");
         // if current player's soldier, select it
         if (soldier.player == this.currentUser) {
+          this.soldiers.forEach(soldier => {
+            soldier.unselect()
+            soldier.removeAttackArrow()
+          });
           soldier.select();
           soldier.showAttackRange();
           this.soldierSelected = soldier;
         }
         // if opponent player and own soldier selected, attack!
         else if (this.soldierSelected) {
+          this.soldiers
+            .forEach(soldier => {
+              soldier.removeAttackArrow()
+              if (soldier != this.soldierSelected) {
+                soldier.unselect()
+              }
+            });
           soldier.select();
           this.soldierSelected.attack(soldier);
           this.stepControls.fight.classList.add('active')
