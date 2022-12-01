@@ -3,12 +3,13 @@ import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
 import porcelainImg from "/public/matcap-porcelain-white.jpg";
 
 export default class Soldier {
-  constructor(player, soldier, color, marker) {
+  constructor(player, soldier, color, marker, onRenderFcts) {
     this.selected = false;
     this.player = player;
     this.soldier = soldier;
     this.color = parseInt(color, 16);
     this.marker = marker;
+    this.onRenderFcts = onRenderFcts;
     this.imageAssetUrl = "/characters/3dAssets/";
     this.porcelainImg = porcelainImg;
     this.createSoldier();
@@ -72,11 +73,17 @@ export default class Soldier {
   attack(otherSoldier) {
     console.log("attack!");
     this.arrowAttack = this.createArrow(otherSoldier);
-    this.marker.add( this.arrowAttack );
+    this.marker.parent.add(this.arrowAttack);
+  }
+
+  removeAttackArrow() {
+    console.log('remove arrow');
+    this.marker.parent.remove( this.arrowAttack );
   }
 
   createArrow(otherSoldier) {
     console.log("arrow");
+    console.log(this.marker, otherSoldier.marker);
     const group = new THREE.Group();
     
     const arrowMat = new THREE.MeshLambertMaterial({color: 0xff9900})
@@ -93,41 +100,26 @@ export default class Soldier {
     cylinderMesh.position.z = -0.25;
     cylinderMesh.position.y = 0.5;
     group.add(cylinderMesh);
-    group.position.copy(this.getMiddleFromRef(otherSoldier.marker, this.marker));
-    group.lookAt(this.getPositionFromRef(otherSoldier.marker, this.marker));
+
+    this.onRenderFcts.push(() => {
+      group.position.copy(this.getMiddle(this.marker.position, otherSoldier.marker.position))
+      group.lookAt(otherSoldier.marker.position);
+    })
     return group;
   }
 
-  getPosition(object) {
-    return new THREE.Vector3(...Object.values(object.position))
+  scalarMiddle(x1, x2){
+    const min = Math.min(x1, x2)
+    const max = Math.max(x1, x2)
+    return min + (Math.abs(max - min) / 2)
   }
-
-  getPositionFromRef(object ,referential) {
+  getMiddle(pos1, pos2){
     return new THREE.Vector3(
-      object.position.x - referential.position.x,
-      object.position.y - referential.position.y,
-      object.position.z - referential.position.z
+      this.scalarMiddle(pos1.x, pos2.x),
+      this.scalarMiddle(pos1.y, pos2.y),
+      this.scalarMiddle(pos1.z, pos2.z)
     )
   }
-
-  getMiddleFromRef(object ,referential) {
-    return new THREE.Vector3(
-      (object.position.x - referential.position.x) / 2,
-      (object.position.y - referential.position.y) / 2,
-      (object.position.z - referential.position.z) / 2
-    )
-  }
-
-  getMiddle(object1, object2) {
-    const scalarMiddle = (x1, x2) => Math.min(x1, x2) + Math.abs(x1 - x2) / 2
-    return new THREE.Vector3(
-      scalarMiddle(object1.position.x, object2.position.x),
-      scalarMiddle(object1.position.y, object2.position.y),
-      scalarMiddle(object1.position.z, object2.position.z)
-    )
-  }
-
-
 
   createBase() {
     const geometry = new THREE.CircleGeometry(1, 32);
@@ -181,7 +173,7 @@ export default class Soldier {
           callback(mesh);
         },
         (xhr) => {
-          console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+          // console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
         },
         (error) => {
           console.log(error);

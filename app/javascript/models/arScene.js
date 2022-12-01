@@ -34,7 +34,8 @@ export default class ArScene {
             player,
             soldier,
             this.armiesInfo[player]["color"],
-            markerRoot
+            markerRoot,
+            this.onRenderFcts
           )
         );
         markerIndex += 1;
@@ -42,7 +43,7 @@ export default class ArScene {
     });
   }
 
-  initScene(callback) {
+  initScene() {
     // init renderer
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -58,7 +59,7 @@ export default class ArScene {
     this.container.appendChild(this.renderer.domElement);
 
     // array of functions for the rendering loop
-    const onRenderFcts = [];
+    this.onRenderFcts = [];
     // let arToolkitContext, markerControls
     let arToolkitContext;
     // init scene and camera
@@ -78,8 +79,8 @@ export default class ArScene {
     this.scene.add(this.camera);
 
     // Add a basic light
-    const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
-    this.scene.add( light );
+    const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
+    this.scene.add(light);
 
     // Create the marker roots
     this.imageMarkers.forEach((imageMarker) => {
@@ -131,7 +132,7 @@ export default class ArScene {
     };
 
     // update artoolkit on every frame
-    onRenderFcts.push(() => {
+    this.onRenderFcts.push(() => {
       if (!arToolkitContext || !arToolkitSource || !arToolkitSource.ready) {
         return;
       }
@@ -146,7 +147,7 @@ export default class ArScene {
     //////////////////////////////////////////////////////////////////////////////////
 
     // render the scene
-    onRenderFcts.push(() => {
+    this.onRenderFcts.push(() => {
       this.renderer.render(this.scene, this.camera);
     });
 
@@ -160,7 +161,7 @@ export default class ArScene {
       var deltaMsec = Math.min(200, nowMsec - lastTimeMsec);
       lastTimeMsec = nowMsec;
       // call each update function
-      onRenderFcts.forEach(function (onRenderFct) {
+      this.onRenderFcts.forEach(function (onRenderFct) {
         onRenderFct(deltaMsec / 1000, nowMsec / 1000);
       });
     };
@@ -223,7 +224,6 @@ export default class ArScene {
   }
 
   performAction(turn, soldier) {
-
     // check actions
     console.log(turn);
     switch (turn) {
@@ -231,7 +231,7 @@ export default class ArScene {
         console.log("start move action");
         // if current player's soldier, select and move it
         if (soldier.player == this.currentUser) {
-          this.soldiers.forEach(soldier => soldier.unselect());
+          this.soldiers.forEach((sold) => sold.unselect());
           soldier.select();
           soldier.showMoveRange();
           this.soldierSelected = soldier;
@@ -241,9 +241,9 @@ export default class ArScene {
         console.log("start attack action");
         // if current player's soldier, select it
         if (soldier.player == this.currentUser) {
-          this.soldiers.forEach(soldier => {
-            soldier.unselect()
-            soldier.removeAttackArrow()
+          this.soldiers.forEach((sol) => {
+            sol.unselect();
+            sol.removeAttackArrow();
           });
           soldier.select();
           soldier.showAttackRange();
@@ -251,17 +251,16 @@ export default class ArScene {
         }
         // if opponent player and own soldier selected, attack!
         else if (this.soldierSelected) {
-          this.soldiers
-            .forEach(soldier => {
-              soldier.removeAttackArrow()
-              if (soldier != this.soldierSelected) {
-                soldier.unselect()
-              }
-            });
+          this.soldiers.forEach((sol) => {
+            sol.removeAttackArrow();
+            if (sol != this.soldierSelected) {
+              sol.unselect();
+            }
+          });
           soldier.select();
           this.soldierSelected.attack(soldier);
-          this.stepControls.fight.classList.add('active')
-          this.stepControls.attack.classList.remove('active')
+          this.stepControls.fight.classList.add("active");
+          this.stepControls.attack.classList.remove("active");
         }
         break;
 
@@ -291,18 +290,20 @@ export default class ArScene {
 
     // unselect all and return if no soldier selected
     if (intersects.length == 0) {
-      this.unSelectAll()
+      this.unSelectAll();
       return;
     }
-    
+
     // retrieve the intersecting soldier
     // intersects is an array of JS obj with a key object containing the soldier part (base or asset)
-    const intersectedSoldierPart = intersects.find(inters => inters.object.marker).object;
-    this.performAction(turn, intersectedSoldierPart.soldier)
+    const intersectedSoldierPart = intersects.find(
+      (inters) => inters.object.marker
+    ).object;
+    this.performAction(turn, intersectedSoldierPart.soldier);
   }
 
   unSelectAll() {
-    this.soldiers.forEach(soldier => soldier.unselect());
+    this.soldiers.forEach((soldier) => soldier.unselect());
     this.soldierSelected = null;
     console.log("unselect all");
   }
