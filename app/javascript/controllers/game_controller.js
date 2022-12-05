@@ -20,8 +20,8 @@ export default class extends Controller {
     this.stepControls = {
       move: this.moveTarget, 
       attack: this.attackTarget, 
-      defense: this.defenseTarget,
-      fight: this.fightTarget
+      fight: this.fightTarget,
+      defense: this.defenseTarget
     }
     
     // define initial turn
@@ -35,12 +35,10 @@ export default class extends Controller {
     )
     console.log(`Subscribed to the game with the id ${this.gameIdValue}.`)
 
-    this.arScene = new ArScene(this.element, this.armiesValue, this.currentUserValue, this.stepControls)
+    this.arScene = new ArScene(this.element, this.armiesValue, this.currentUserValue, this)
 
     // Listen to click on the scene
-    window.addEventListener("click", (event) => {
-      this.arScene.onSelect(this.turn, event)
-    });
+    window.addEventListener("click", this.arScene.onSelect.bind(this.arScene));
   }
 
   setTurnPlayer(player) {
@@ -74,6 +72,20 @@ export default class extends Controller {
     if (this.turn == 'defense') {
       this.endTurn();
     }
+    this.updateStepControls()
+  }
+
+  setTurn(turn) {
+    this.turn = turn
+    this.updateStepControls()
+  }
+
+  prevTurn() {
+    const steps = Object.keys(this.stepControls)
+    const currentTurn = steps.indexOf(this.turn)
+    const prevTurn = currentTurn > 0 ? currentTurn - 1 : currentTurn
+    this.turn = steps[prevTurn]
+    console.log("prev turn", this.turn);
     this.updateStepControls()
   }
 

@@ -38,7 +38,7 @@ export default class Soldier {
     this.marker.parent.remove(this.range);
     this.marker.remove(this.range);
     this.marker.remove(this.selectCircle);
-    this.marker.remove( this.arrowAttack );
+    this.marker.parent.remove( this.arrowAttack );
 
   }
 
@@ -173,7 +173,7 @@ export default class Soldier {
           callback(mesh);
         },
         (xhr) => {
-          // console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+          console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
         },
         (error) => {
           console.log(error);

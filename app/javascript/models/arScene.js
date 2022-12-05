@@ -5,7 +5,7 @@ import Soldier from "../models/soldier";
 THREEx.ArToolkitContext.baseURL = "/";
 
 export default class ArScene {
-  constructor(container, armiesInfo, currentUser, stepControls) {
+  constructor(container, armiesInfo, currentUser, gameController) {
     this.imageMarkerFolder = "/characters/markers/";
     this.imageMarkers = ["m1", "m2", "m3", "m4", "m5", "m6"];
 
@@ -16,7 +16,7 @@ export default class ArScene {
 
     this.armiesInfo = armiesInfo;
     this.currentUser = currentUser;
-    this.stepControls = stepControls;
+    this.gameController = gameController;
     this.soldiers = [];
     this.soldierSelected;
     this.markers = [];
@@ -223,10 +223,10 @@ export default class ArScene {
     return arToolkitContext;
   }
 
-  performAction(turn, soldier) {
+  performAction(soldier) {
     // check actions
-    console.log(turn);
-    switch (turn) {
+    console.log(this.gameController.turn);
+    switch (this.gameController.turn) {
       case "move":
         console.log("start move action");
         // if current player's soldier, select and move it
@@ -238,6 +238,7 @@ export default class ArScene {
         }
         break;
       case "attack":
+      case "fight":
         console.log("start attack action");
         // if current player's soldier, select it
         if (soldier.player == this.currentUser) {
@@ -245,6 +246,7 @@ export default class ArScene {
             sol.unselect();
             sol.removeAttackArrow();
           });
+          this.gameController.setTurn("attack")
           soldier.select();
           soldier.showAttackRange();
           this.soldierSelected = soldier;
@@ -259,21 +261,19 @@ export default class ArScene {
           });
           soldier.select();
           this.soldierSelected.attack(soldier);
-          this.stepControls.fight.classList.add("active");
-          this.stepControls.attack.classList.remove("active");
+          this.gameController.setTurn("fight")
         }
         break;
-
       default:
         console.log("no action");
         break;
     }
   }
 
-  onSelect(turn, event) {
-    console.log(turn);
+  onSelect(event) {
+    console.log(this.gameController.turn);
     // if defense mode no selection possible
-    if (turn == "defense") {
+    if (this.gameController.turn == "defense") {
       return;
     }
 
@@ -289,6 +289,7 @@ export default class ArScene {
     const intersects = this.raycaster.intersectObjects(this.markers);
 
     // unselect all and return if no soldier selected
+    console.log(intersects.length);
     if (intersects.length == 0) {
       this.unSelectAll();
       return;
@@ -299,12 +300,15 @@ export default class ArScene {
     const intersectedSoldierPart = intersects.find(
       (inters) => inters.object.marker
     ).object;
-    this.performAction(turn, intersectedSoldierPart.soldier);
+    this.performAction(intersectedSoldierPart.soldier);
   }
 
   unSelectAll() {
     this.soldiers.forEach((soldier) => soldier.unselect());
     this.soldierSelected = null;
+    if (this.gameController.turn == "fight") {
+      this.gameController.setTurn("attack")
+    }
     console.log("unselect all");
   }
 }
