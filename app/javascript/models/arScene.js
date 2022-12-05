@@ -1,34 +1,31 @@
-import * as THREE from "three";
-import * as THREEx from "@ar-js-org/ar.js/three.js/build/ar-threex.js";
-import Soldier from "../models/soldier";
+import * as THREE from "three"
+import * as THREEx from "@ar-js-org/ar.js/three.js/build/ar-threex.js"
+import Soldier from "../models/soldier"
 
-THREEx.ArToolkitContext.baseURL = "/";
+THREEx.ArToolkitContext.baseURL = "/"
 
 export default class ArScene {
   constructor(container, armiesInfo, currentUser, gameController) {
-    this.imageMarkerFolder = "/characters/markers/";
-    this.imageMarkers = ["m1", "m2", "m3", "m4", "m5", "m6"];
+    this.imageMarkerFolder = "/characters/markers/"
+    this.imageMarkers = ["m1", "m2", "m3", "m4", "m5", "m6"]
 
-    // raycasting variables
-    this.container = container;
-    this.pointer = new THREE.Vector2(0, 0);
-    this.raycaster = new THREE.Raycaster();
+    this.container = container
+    this.armiesInfo = armiesInfo
+    this.currentUser = currentUser
+    this.gameController = gameController
+    
+    this.soldiers = []
+    this.soldierSelected = false
+    this.markers = []
 
-    this.armiesInfo = armiesInfo;
-    this.currentUser = currentUser;
-    this.gameController = gameController;
-    this.soldiers = [];
-    this.soldierSelected;
-    this.markers = [];
-
-    this.initScene();
+    this.initScene()
   }
 
   createStuffs() {
-    let markerIndex = 0;
+    let markerIndex = 0
     Object.keys(this.armiesInfo).forEach((player) => {
       this.armiesInfo[player]["army"].forEach((soldier) => {
-        const markerRoot = this.markers[markerIndex];
+        const markerRoot = this.markers[markerIndex]
         this.soldiers.push(
           new Soldier(
             player,
@@ -37,10 +34,10 @@ export default class ArScene {
             markerRoot,
             this.onRenderFcts
           )
-        );
-        markerIndex += 1;
-      });
-    });
+        )
+        markerIndex += 1
+      })
+    })
   }
 
   initScene() {
@@ -49,21 +46,21 @@ export default class ArScene {
       antialias: true,
       autoResize: true,
       alpha: true,
-    });
-    this.renderer.setClearColor(new THREE.Color("lightgrey"), 0);
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.renderer.domElement.style.position = "absolute";
-    this.renderer.domElement.style.top = "0px";
-    this.renderer.domElement.style.left = "0px";
-    this.container.appendChild(this.renderer.domElement);
+    })
+    this.renderer.setClearColor(new THREE.Color("lightgrey"), 0)
+    this.renderer.setSize(window.innerWidth, window.innerHeight)
+    this.renderer.setPixelRatio(window.devicePixelRatio)
+    this.renderer.domElement.style.position = "absolute"
+    this.renderer.domElement.style.top = "0px"
+    this.renderer.domElement.style.left = "0px"
+    this.container.appendChild(this.renderer.domElement)
 
     // array of functions for the rendering loop
-    this.onRenderFcts = [];
+    this.onRenderFcts = []
     // let arToolkitContext, markerControls
-    let arToolkitContext;
+    let arToolkitContext
     // init scene and camera
-    this.scene = new THREE.Scene();
+    this.scene = new THREE.Scene()
 
     //////////////////////////////////////////////////////////////////////////////////
     //		Initialize a basic camera
@@ -75,24 +72,24 @@ export default class ArScene {
       window.innerWidth / window.innerHeight,
       1,
       1000
-    );
-    this.scene.add(this.camera);
+    )
+    this.scene.add(this.camera)
 
     // Add a basic light
-    const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
-    this.scene.add(light);
+    const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1)
+    this.scene.add(light)
 
     // Create the marker roots
     this.imageMarkers.forEach((imageMarker) => {
-      const markerRoot = new THREE.Group();
-      markerRoot.name = imageMarker;
-      markerRoot.isMarker = true;
-      markerRoot.position.x = 999;
-      markerRoot.position.y = 999;
-      markerRoot.position.z = 999;
-      this.scene.add(markerRoot);
-      this.markers.push(markerRoot);
-    });
+      const markerRoot = new THREE.Group()
+      markerRoot.name = imageMarker
+      markerRoot.isMarker = true
+      markerRoot.position.x = 999
+      markerRoot.position.y = 999
+      markerRoot.position.z = 999
+      this.scene.add(markerRoot)
+      this.markers.push(markerRoot)
+    })
 
     ////////////////////////////////////////////////////////////////////////////////
     //          handle arToolkitSource
@@ -109,38 +106,38 @@ export default class ArScene {
       // to read from a video
       // sourceType : 'video',
       // sourceUrl : THREEx.ArToolkitContext.baseURL + '../data/videos/headtracking.mp4',
-    });
+    })
 
     arToolkitSource.init(() => {
-      arToolkitContext = this.initARContext(arToolkitSource);
+      arToolkitContext = this.initARContext(arToolkitSource)
       setTimeout(() => {
-        onResize();
-      }, 200);
-      onResize();
-    });
+        onResize()
+      }, 200)
+      onResize()
+    })
 
     // handle resize
     window.addEventListener("resize", () => {
-      onResize();
-    });
+      onResize()
+    })
     const onResize = () => {
-      arToolkitSource.onResizeElement();
-      arToolkitSource.copyElementSizeTo(this.renderer.domElement);
+      arToolkitSource.onResizeElement()
+      arToolkitSource.copyElementSizeTo(this.renderer.domElement)
       if (arToolkitContext.arController !== null) {
-        arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas);
+        arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas)
       }
-    };
+    }
 
     // update artoolkit on every frame
     this.onRenderFcts.push(() => {
       if (!arToolkitContext || !arToolkitSource || !arToolkitSource.ready) {
-        return;
+        return
       }
 
-      arToolkitContext.update(arToolkitSource.domElement);
-    });
+      arToolkitContext.update(arToolkitSource.domElement)
+    })
 
-    this.createStuffs();
+    this.createStuffs()
 
     //////////////////////////////////////////////////////////////////////////////////
     //		render the whole thing on the page
@@ -148,167 +145,169 @@ export default class ArScene {
 
     // render the scene
     this.onRenderFcts.push(() => {
-      this.renderer.render(this.scene, this.camera);
-    });
+      this.renderer.render(this.scene, this.camera)
+    })
 
     // run the rendering loop
-    var lastTimeMsec = null;
+    var lastTimeMsec = null
     const animate = (nowMsec) => {
       // keep looping
-      requestAnimationFrame(animate);
+      requestAnimationFrame(animate)
       // measure time
-      lastTimeMsec = lastTimeMsec || nowMsec - 1000 / 60;
-      var deltaMsec = Math.min(200, nowMsec - lastTimeMsec);
-      lastTimeMsec = nowMsec;
+      lastTimeMsec = lastTimeMsec || nowMsec - 1000 / 60
+      var deltaMsec = Math.min(200, nowMsec - lastTimeMsec)
+      lastTimeMsec = nowMsec
       // call each update function
       this.onRenderFcts.forEach(function (onRenderFct) {
-        onRenderFct(deltaMsec / 1000, nowMsec / 1000);
-      });
-    };
-    requestAnimationFrame(animate);
+        onRenderFct(deltaMsec / 1000, nowMsec / 1000)
+      })
+    }
+    requestAnimationFrame(animate)
   }
 
   initARContext(arToolkitSource) {
     const getSourceOrientation = () => {
       if (!arToolkitSource) {
-        return null;
+        return null
       }
 
       console.log(
         "actual source dimensions",
         arToolkitSource.domElement.videoWidth,
         arToolkitSource.domElement.videoHeight
-      );
+      )
 
       if (
         arToolkitSource.domElement.videoWidth >
         arToolkitSource.domElement.videoHeight
       ) {
-        console.log("source orientation", "landscape");
-        return "landscape";
+        console.log("source orientation", "landscape")
+        return "landscape"
       } else {
-        console.log("source orientation", "portrait");
-        return "portrait";
+        console.log("source orientation", "portrait")
+        return "portrait"
       }
-    };
+    }
 
-    console.log("initARContext()");
+    console.log("initARContext()")
     // create atToolkitContext
     const arToolkitContext = new THREEx.ArToolkitContext({
       cameraParametersUrl: THREEx.ArToolkitContext.baseURL + "camera_para.dat",
       detectionMode: "mono",
       canvasWidth: window.innerWidth,
       canvasHeight: window.innerHeight,
-    });
+    })
     // initialize it
     arToolkitContext.init(() => {
       // copy projection matrix to camera
-      this.camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
-      arToolkitContext.arController.orientation = getSourceOrientation();
+      this.camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix())
+      arToolkitContext.arController.orientation = getSourceOrientation()
       arToolkitContext.arController.options.orientation =
-        getSourceOrientation();
+        getSourceOrientation()
 
-      console.log("arToolkitContext", arToolkitContext);
-      window.arToolkitContext = arToolkitContext;
-    });
+      console.log("arToolkitContext", arToolkitContext)
+      window.arToolkitContext = arToolkitContext
+    })
     // build markerControls for markerRoot1
     this.markers.forEach((marker) => {
       new THREEx.ArMarkerControls(arToolkitContext, marker, {
         type: "pattern",
         patternUrl: `${this.imageMarkerFolder}pattern-${marker.name}.patt`,
         // patternUrl : THREEx.ArToolkitContext.baseURL + '../data/data/patt.kanji',
-      });
-    });
+      })
+    })
 
-    return arToolkitContext;
+    return arToolkitContext
   }
 
   performAction(soldier) {
     // check actions
-    console.log(this.gameController.turn);
+    console.log(this.gameController.turn)
     switch (this.gameController.turn) {
       case "move":
-        console.log("start move action");
+        console.log("start move action")
         // if current player's soldier, select and move it
         if (soldier.player == this.currentUser) {
-          this.soldiers.forEach((sold) => sold.unselect());
-          soldier.select();
-          soldier.showMoveRange();
-          this.soldierSelected = soldier;
+          this.unSelectAll()
+          soldier.select()
+          soldier.showMoveRange()
+          this.soldierSelected = soldier
         }
-        break;
+        break
       case "attack":
       case "fight":
-        console.log("start attack action");
+        console.log("start attack action")
         // if current player's soldier, select it
         if (soldier.player == this.currentUser) {
           this.soldiers.forEach((sol) => {
-            sol.unselect();
-            sol.removeAttackArrow();
-          });
+            sol.unSelect()
+            sol.removeAttackArrow()
+          })
           this.gameController.setTurn("attack")
-          soldier.select();
-          soldier.showAttackRange();
-          this.soldierSelected = soldier;
+          soldier.select()
+          soldier.showAttackRange()
+          this.soldierSelected = soldier
         }
         // if opponent player and own soldier selected, attack!
         else if (this.soldierSelected) {
           this.soldiers.forEach((sol) => {
-            sol.removeAttackArrow();
+            sol.removeAttackArrow()
             if (sol != this.soldierSelected) {
-              sol.unselect();
+              sol.unSelect()
             }
-          });
-          soldier.select();
-          this.soldierSelected.attack(soldier);
+          })
+          soldier.select()
+          this.soldierSelected.attack(soldier)
           this.gameController.setTurn("fight")
         }
-        break;
+        break
       default:
-        console.log("no action");
-        break;
+        console.log("no action")
+        break
     }
   }
 
   onSelect(event) {
-    console.log(this.gameController.turn);
+    console.log(this.gameController.turn)
     // if defense mode no selection possible
     if (this.gameController.turn == "defense") {
-      return;
+      return
     }
 
     // calculate pointer position in normalized device coordinates
     // (-1 to +1) for both components
-    this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-    this.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    const pointer = new THREE.Vector2(0, 0)
+    pointer.x = (event.clientX / window.innerWidth) * 2 - 1
+    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
 
     // update the picking ray with the camera and pointer position
-    this.raycaster.setFromCamera(this.pointer, this.camera);
+    const raycaster = new THREE.Raycaster()
+    raycaster.setFromCamera(pointer, this.camera)
 
     // calculate objects intersecting the picking ray
-    const intersects = this.raycaster.intersectObjects(this.markers);
+    const intersects = raycaster.intersectObjects(this.markers)
 
     // unselect all and return if no soldier selected
-    console.log(intersects.length);
+    console.log(intersects.length)
     if (intersects.length == 0) {
-      this.unSelectAll();
-      return;
+      this.unSelectAll()
+      return
     }
 
     // retrieve the intersecting soldier
     // intersects is an array of JS obj with a key object containing the soldier part (base or asset)
     const intersectedSoldierPart = intersects.find(
       (inters) => inters.object.marker
-    ).object;
-    this.performAction(intersectedSoldierPart.soldier);
+    ).object
+    this.performAction(intersectedSoldierPart.soldier)
   }
 
   unSelectAll() {
-    this.soldiers.forEach((soldier) => soldier.unselect());
-    this.soldierSelected = null;
+    this.soldiers.forEach((soldier) => soldier.unSelect())
+    this.soldierSelected = null
     if (this.gameController.turn == "fight") {
       this.gameController.setTurn("attack")
     }
-    console.log("unselect all");
+    console.log("unselect all")
   }
 }
