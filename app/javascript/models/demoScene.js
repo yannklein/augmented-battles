@@ -1,5 +1,6 @@
 import * as THREE from "three"
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 import Soldier from "../models/soldier"
 import ArScene from "./arScene";
 
@@ -34,7 +35,7 @@ export default class DemoScene extends ArScene {
   initScene() {
     // init renderer
     this.renderer = new THREE.WebGLRenderer()
-    // this.renderer.setClearColor(new THREE.Color("lightgrey"), 0)
+    this.renderer.setClearColor(new THREE.Color("lightgrey"), 0.5)
     this.renderer.setSize(window.innerWidth, window.innerHeight)
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.domElement.style.position = "absolute"
@@ -55,6 +56,10 @@ export default class DemoScene extends ArScene {
     // Create a camera
     this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
     this.scene.add(this.camera)
+
+    // Add a basic light
+    const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1)
+    this.scene.add(light)
 
 
     // Adding some helpers
@@ -80,6 +85,30 @@ export default class DemoScene extends ArScene {
       markerRoot.position.z = 999
       this.scene.add(markerRoot)
       this.markers.push(markerRoot)
+    })
+
+    document.addEventListener("keydown", (event) => {
+      const soldier = this.soldiers.find((soldier) => soldier.selected)
+      console.log(soldier);
+      if (!soldier) {
+        return;
+      }
+      switch (event.key) {
+        case "ArrowUp":
+          soldier.marker.position.z -= 0.1
+          break;
+        case "ArrowDown":
+          soldier.marker.position.z += 0.1
+          break;
+        case "ArrowRight":
+          soldier.marker.position.x += 0.1
+          break;
+        case "ArrowLeft":
+          soldier.marker.position.x -= 0.1
+          break;
+        default:
+          break;
+      }
     })
     
     this.createStuffs()

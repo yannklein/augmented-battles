@@ -113,7 +113,9 @@ export default class extends Controller {
   fight() {
     console.log("fight action")
     this.nextTurn()
+    // fight cinematic happenning
     setTimeout(() => {
+      // got to next turn
       this.nextTurn()
     }, 2000)
   }
