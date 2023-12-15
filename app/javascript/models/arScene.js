@@ -15,7 +15,8 @@ export default class ArScene {
     this.gameController = gameController
     
     this.soldiers = []
-    this.soldierSelected = false
+    this.soldierSelected = null
+    this.soldierAttacked = null
     this.markers = []
     
     this.initScene()
@@ -257,13 +258,18 @@ export default class ArScene {
               sol.unSelect()
             }
           })
-          soldier.select()
-          this.soldierSelected.attack(soldier)
+          this.soldierAttacked = soldier
+          this.soldierAttacked.select()
+          this.soldierSelected.attack(this.soldierAttacked)
           this.gameController.setTurn("fight")
         }
         break
       case "fightCinematic":
-        console.log(soldier, this.soldierSelected);
+        console.log(this.soldierAttacked, this.soldierSelected);
+        const impact = - Math.round(this.soldierSelected.soldier.skirmish_power * Math.random())
+        console.log({impact});
+        this.soldierAttacked.updateMana(impact)
+        // TODO: update mana in backend
         console.log("fightCinematic")
       default:
         console.log("no action", this.gameController.turn)

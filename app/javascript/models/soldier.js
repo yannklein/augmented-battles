@@ -182,6 +182,19 @@ export default class Soldier {
     })
   }
 
+  updateMana(value){
+    // callback(this.soldier.mana)
+    this.soldier.mana += value
+    const oldText = this.soldierGroup.getObjectByName("text");
+    this.soldierGroup.remove(oldText)
+    this.text = this.createText(
+      `${this.soldier.name} ${this.soldier.skirmish_power}/${this.soldier.distance_power} ❤️${this.soldier.mana}`,
+      12
+      )
+    console.log(this.soldier);
+    this.soldierGroup.add(this.text)
+  }
+
   createSoldier() {
     this.soldierGroup = new THREE.Group()
     this.soldierGroup.name = this.soldier.name
@@ -231,7 +244,7 @@ export default class Soldier {
       new THREE.PlaneGeometry(textWidth / 60, textHeight / 60, 10, 10),
       material
     )
-
+    mesh.name = "text"
     mesh.position.y = 0
     mesh.position.z = 2
     mesh.position.x = 0
