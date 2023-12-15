@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { createConsumer } from "@rails/actioncable"
 
+import DemoScene from "../models/demoScene"
 import ArScene from "../models/arScene"
 
 // Connects to data-controller="game"
@@ -13,7 +14,11 @@ export default class extends Controller {
   }
   static targets = ['move', 'attack', 'defense', 'fight', 'settingMenu', 'score']
 
-  connect() {  
+  connect() { 
+    // initialize AR vs Demo (non-AR) mode
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    this.mode = urlParams.get('mode');
     // initialize turn targets
     this.stepControls = {
       move: this.moveTarget, 
@@ -34,7 +39,12 @@ export default class extends Controller {
     )
 
     // initialize the AR scene
-    this.arScene = new ArScene(this.element, this.armiesValue, this.currentUserValue, this)
+      if (this.mode === "demo") {
+        this.arScene = new DemoScene(this.element, this.armiesValue, this.currentUserValue, this)
+      }
+      else {
+        this.arScene = new ArScene(this.element, this.armiesValue, this.currentUserValue, this)
+      }
 
     // Listen to click on the scene
     window.addEventListener("click", this.arScene.onSelect.bind(this.arScene))
