@@ -19,7 +19,6 @@ export default class ArScene {
     this.markers = []
     
     this.initScene()
-    console.log("ArScene initilaized")
   }
 
   createStuffs() {
@@ -164,6 +163,7 @@ export default class ArScene {
       })
     }
     requestAnimationFrame(animate)
+    console.log("ArScene initialized")
   }
 
   initARContext(arToolkitSource) {

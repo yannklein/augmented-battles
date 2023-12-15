@@ -1,24 +1,12 @@
 import * as THREE from "three"
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import Soldier from "../models/soldier"
+import ArScene from "./arScene";
 
 
-export default class DemoScene {
+export default class DemoScene extends ArScene {
   constructor(container, armiesInfo, currentUser, gameController) {
-    this.imageMarkerFolder = "/characters/markers/"
-    this.imageMarkers = ["m1", "m2", "m3", "m4", "m5", "m6"]
-
-    this.container = container
-    this.armiesInfo = armiesInfo
-    this.currentUser = currentUser
-    this.gameController = gameController
-    
-    this.soldiers = []
-    this.soldierSelected = false
-    this.markers = []
-
-    this.initScene()
-    console.log("DemoScene initialized")
+    super(container, armiesInfo, currentUser, gameController)
   }
 
   createStuffs() {
@@ -123,96 +111,6 @@ export default class DemoScene {
       })
     }
     requestAnimationFrame(animate)
-  }
-
-  performAction(soldier) {
-    // check actions
-    console.log(this.gameController.turn)
-    switch (this.gameController.turn) {
-      case "move":
-        console.log("start move action")
-        // if current player's soldier, select and move it
-        if (soldier.player == this.currentUser) {
-          this.unSelectAll()
-          soldier.select()
-          soldier.showMoveRange()
-          this.soldierSelected = soldier
-        }
-        break
-      case "attack":
-      case "fight":
-        console.log("start attack action")
-        // if current player's soldier, select it
-        if (soldier.player == this.currentUser) {
-          this.soldiers.forEach((sol) => {
-            sol.unSelect()
-            sol.removeAttackArrow()
-          })
-          this.gameController.setTurn("attack")
-          soldier.select()
-          soldier.showAttackRange()
-          this.soldierSelected = soldier
-        }
-        // if opponent player and own soldier selected, attack!
-        else if (this.soldierSelected) {
-          this.soldiers.forEach((sol) => {
-            sol.removeAttackArrow()
-            if (sol != this.soldierSelected) {
-              sol.unSelect()
-            }
-          })
-          soldier.select()
-          this.soldierSelected.attack(soldier)
-          this.gameController.setTurn("fight")
-        }
-        break
-      default:
-        console.log("no action")
-        break
-    }
-  }
-
-  onSelect(event) {
-    console.log(this.gameController.turn)
-    // if defense mode no selection possible
-    if (this.gameController.turn == "defense") {
-      return
-    }
-
-    // calculate pointer position in normalized device coordinates
-    // (-1 to +1) for both components
-    const pointer = new THREE.Vector2(0, 0)
-    pointer.x = (event.clientX / window.innerWidth) * 2 - 1
-    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
-
-    // update the picking ray with the camera and pointer position
-    const raycaster = new THREE.Raycaster()
-    raycaster.setFromCamera(pointer, this.camera)
-
-    // calculate objects intersecting the picking ray
-    const intersects = raycaster.intersectObjects(this.markers)
-
-    // unselect all and return if no soldier selected
-    console.log(intersects.length)
-    if (intersects.length == 0) {
-      this.unSelectAll()
-      return
-    }
-
-    // retrieve the intersecting soldier
-    // intersects is an array of JS obj with a key object containing the soldier part (base or asset)
-    const intersectedSoldierPart = intersects.find(
-      (inters) => inters.object.marker
-    ).object
-    this.performAction(intersectedSoldierPart.soldier)
-  }
-
-  unSelectAll() {
-    this.soldiers.forEach((soldier) => soldier.unSelect())
-    this.soldierSelected = null
-    if (this.gameController.turn == "fight") {
-      this.gameController.setTurn("attack")
-    }
-    console.log("unselect all")
+    console.log("DemoScene initialized")
   }
 }
