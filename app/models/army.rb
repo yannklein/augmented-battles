@@ -12,7 +12,8 @@ class Army < ApplicationRecord
         skirmish_power: rand(1..11), 
         distance_power: rand(1..11), 
         max_distance: rand(1..11), 
-        speed: rand(1..11)
+        speed: rand(1..11),
+        mana: rand(5..10)
       )
       new_soldier.army = self
       new_soldier.save

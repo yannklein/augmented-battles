@@ -262,8 +262,11 @@ export default class ArScene {
           this.gameController.setTurn("fight")
         }
         break
+      case "fightCinematic":
+        console.log(soldier, this.soldierSelected);
+        console.log("fightCinematic")
       default:
-        console.log("no action")
+        console.log("no action", this.gameController.turn)
         break
     }
   }
