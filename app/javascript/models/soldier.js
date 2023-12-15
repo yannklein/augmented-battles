@@ -194,7 +194,7 @@ export default class Soldier {
     })
 
     this.text = this.createText(
-      `${this.soldier.name} ${this.soldier.skirmish_power}/${this.soldier.distance_power}`,
+      `${this.soldier.name} ${this.soldier.skirmish_power}/${this.soldier.distance_power} ❤️${this.soldier.mana}`,
       12
     )
     this.soldierGroup.add(this.text)
