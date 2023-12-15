@@ -9,7 +9,7 @@ Rails.application.routes.draw do
     resources :armies, only: [:create]
   end
 
-  resources :armies do
-    resources :soldiers, only: [:update]
-  end
+  # resources :armies do
+  resources :soldiers, only: [:update]
+  # end
 end

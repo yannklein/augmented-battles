@@ -61,8 +61,15 @@ export default class extends Controller {
   processChannelMsg(data) {
     // receive and process websocket data (so far, only who's current player)
     console.log(data)
+    // turn message
     if (data.turn_user) {
       this.setTurnPlayer(data.turn_user)
+    }
+    // soldier update msg
+    if (data.soldier_id) {
+      const soldier = this.arScene.soldiers.find(sol => sol.soldier.id === data.soldier_id)
+      console.log(this.arScene);
+      soldier.updateManaDisplay(data.mana)
     }
   }
 

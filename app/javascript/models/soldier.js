@@ -182,9 +182,8 @@ export default class Soldier {
     })
   }
 
-  updateMana(value){
-    // callback(this.soldier.mana)
-    this.soldier.mana += value
+  updateManaDisplay(mana) {
+    this.soldier.mana = mana
     const oldText = this.soldierGroup.getObjectByName("text");
     this.soldierGroup.remove(oldText)
     this.text = this.createText(
@@ -193,6 +192,24 @@ export default class Soldier {
       )
     console.log(this.soldier);
     this.soldierGroup.add(this.text)
+  }
+
+  updateMana(value){
+    // callback(this.soldier.mana)
+    const url = `/soldiers/${this.soldier.id}`
+    console.log(url);
+    var token = document.getElementsByName('csrf-token')[0].content
+    const form = new FormData();
+    form.append("soldier[mana]", this.soldier.mana + value)
+    fetch(url, {
+      method: "PATCH",
+      headers: { "X-CSRF-Token": token},
+      body: form
+    })
+      .then(r => r.json())
+      .then((soldierData) => {
+        this.updateManaDisplay(soldierData.mana)
+    })
   }
 
   createSoldier() {

@@ -47,7 +47,7 @@ class GamesController < ApplicationController
     @game.armies.each_with_index do |army, index|
       @armies[army.user.id] = {}
       @armies[army.user.id]['turn'] = army.user.id == @game.turn.id
-      @armies[army.user.id]['army'] = army.soldiers.map { |soldier| soldier.as_json }
+      @armies[army.user.id]['army'] = army.soldiers.order(:name).map { |soldier| soldier.as_json }
       @armies[army.user.id]['color'] = player_color[index]
     end
   end
