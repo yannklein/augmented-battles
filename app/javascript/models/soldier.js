@@ -198,9 +198,11 @@ export default class Soldier {
     // callback(this.soldier.mana)
     const url = `/soldiers/${this.soldier.id}`
     console.log(url);
-    var token = document.getElementsByName('csrf-token')[0].content
+    const token = document.getElementsByName('csrf-token')[0].content
+    let newMana = this.soldier.mana + value
+    newMana = newMana >= 0 ? newMana : 0
     const form = new FormData();
-    form.append("soldier[mana]", this.soldier.mana + value)
+    form.append("soldier[mana]", newMana)
     fetch(url, {
       method: "PATCH",
       headers: { "X-CSRF-Token": token},
