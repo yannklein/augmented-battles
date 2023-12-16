@@ -13,6 +13,12 @@ export default class Soldier {
     this.imageAssetUrl = "/characters/3dAssets/"
     this.porcelainImg = porcelainImg
     this.createSoldier()
+
+    // invisible if no more mana
+    if (this.soldier.mana <= 0) {
+      this.killSoldier()
+      return
+    }
   }
 
   select() {
@@ -182,8 +188,16 @@ export default class Soldier {
     })
   }
 
+  killSoldier() {
+    this.marker.visible = false
+  }
+
   updateManaDisplay(mana) {
     this.soldier.mana = mana
+    if (this.soldier.mana <= 0) {
+      this.killSoldier()
+      return
+    }
     const oldText = this.soldierGroup.getObjectByName("text");
     this.soldierGroup.remove(oldText)
     this.text = this.createText(

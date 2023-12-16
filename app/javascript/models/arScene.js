@@ -306,10 +306,10 @@ export default class ArScene {
 
     // retrieve the intersecting soldier
     // intersects is an array of JS obj with a key object containing the soldier part (base or asset)
-    const intersectedSoldierPart = intersects.find(
-      (inters) => inters.object.marker
-    ).object
-    this.performAction(intersectedSoldierPart.soldier)
+    const intersectedSoldierPart = intersects.find((inters) => inters.object.marker).object
+    if (intersectedSoldierPart.soldier.marker.visible) {
+      this.performAction(intersectedSoldierPart.soldier)
+    }
   }
 
   unSelectAll() {
