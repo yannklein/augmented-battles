@@ -12,7 +12,7 @@ export default class extends Controller {
     turnUser: String,
     gameId: Number
   }
-  static targets = ['move', 'attack', 'defense', 'fight', 'settingMenu', 'score']
+  static targets = ['move', 'attack', 'defense', 'fight', 'settingMenu', 'score', 'fist']
 
   connect() { 
     // initialize AR vs Demo (non-AR) mode
@@ -70,6 +70,10 @@ export default class extends Controller {
       const soldier = this.arScene.soldiers.find(sol => sol.soldier.id === data.soldier_id)
       console.log(this.arScene);
       soldier.updateManaDisplay(data.mana)
+
+      if (data.mana <= 0) {
+        this.fistTargets.find(fist => fist.id === `life-${data.soldier_id}`).remove();
+      }
     }
   }
 
