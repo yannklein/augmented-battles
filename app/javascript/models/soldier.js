@@ -40,6 +40,9 @@ export default class Soldier {
   unSelect() {
     // this.base.material.opacity = 0.1
     this.selected = false
+    if (!this.marker || !this.marker.parent) {
+      return
+    }
     // remove range/selection circle wherever it is
     this.marker.parent.remove(this.range)
     this.marker.remove(this.range)
@@ -190,6 +193,7 @@ export default class Soldier {
 
   killSoldier() {
     this.marker.visible = false
+    // this.marker.parent.removeFromParent()
   }
 
   updateManaDisplay(mana) {

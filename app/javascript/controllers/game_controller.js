@@ -8,11 +8,11 @@ import ArScene from "../models/arScene"
 export default class extends Controller {
   static values = {
     armies: Object,
-    currentUser: String,
+    currentUser: Number,
     turnUser: String,
     gameId: Number
   }
-  static targets = ['move', 'attack', 'defense', 'fight', 'settingMenu', 'score', 'fist']
+  static targets = ['move', 'attack', 'defense', 'fight', 'settingMenu', 'score', 'fist', 'winner']
 
   connect() { 
     // initialize AR vs Demo (non-AR) mode
@@ -74,6 +74,16 @@ export default class extends Controller {
       if (data.mana <= 0) {
         this.fistTargets.find(fist => fist.id === `life-${data.soldier_id}`).remove();
       }
+    }
+
+    // army update msg
+    if (data.army_id) {
+      console.log(this.currentUserValue, data.user_id, this.currentUserValue === data.user_id)
+      const outcome = (this.currentUserValue === data.user_id) ? "You won!" : "You lost!"
+      console.log(outcome, this.winnerTarget.firstElementChild);
+      this.winnerTarget.firstElementChild.innerText = outcome;
+      this.winnerTarget.classList.add('d-flex');
+      this.winnerTarget.classList.remove('d-none');
     }
   }
 

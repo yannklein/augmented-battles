@@ -19,4 +19,8 @@ class Army < ApplicationRecord
       new_soldier.save
     end
   end
+
+  def isDecimated()
+    soldiers.all? {|s| s.mana <= 0 }
+  end
 end

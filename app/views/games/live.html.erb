@@ -51,4 +51,10 @@
       <span class="inactive">Wait for your turn...</span>
     </div>
   </div>
+  <div data-game-target="winner" class="game-winner-msg <%= @game.winner.present? ? "d-flex" : "d-none" %>">
+    <h1>
+      <%= @game.winner == current_user ? "You won!" : "You lost!" %>
+    </h1>
+    <%= link_to "Back to game menu", game_path(@game) %>
+  </div>
 </div>
