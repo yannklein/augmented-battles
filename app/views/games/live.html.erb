@@ -2,8 +2,8 @@
   class="game-frame" 
   data-controller="game" 
   data-game-armies-value=<%= @armies.to_json %> 
-  data-game-current-user-value='<%= current_user.id %>'
-  data-game-turn-user-value='<%= @game.turn.id %>'
+  data-game-current-user-id-value='<%= current_user.id %>'
+  data-game-turn-user-id-value='<%= @game.turn.id %>'
   data-game-game-id-value='<%= @game.id %>'
 >
   <div class="game-score">

@@ -8,8 +8,8 @@ import ArScene from "../models/arScene"
 export default class extends Controller {
   static values = {
     armies: Object,
-    currentUser: Number,
-    turnUser: String,
+    currentUserId: Number,
+    turnUserId: Number,
     gameId: Number
   }
   static targets = ['move', 'attack', 'defense', 'fight', 'settingMenu', 'score', 'fist', 'winner']
@@ -29,7 +29,7 @@ export default class extends Controller {
     }
     
     // define initial turn
-    this.turn = this.turnUserValue
+    this.turn = this.turnUserIdValue
     this.setTurnPlayer(this.turn)
 
     // initialize websocket
@@ -40,10 +40,10 @@ export default class extends Controller {
 
     // initialize the AR scene
       if (this.mode === "demo") {
-        this.arScene = new DemoScene(this.element, this.armiesValue, this.currentUserValue, this)
+        this.arScene = new DemoScene(this.element, this.armiesValue, this.currentUserIdValue, this)
       }
       else {
-        this.arScene = new ArScene(this.element, this.armiesValue, this.currentUserValue, this)
+        this.arScene = new ArScene(this.element, this.armiesValue, this.currentUserIdValue, this)
       }
 
     // Listen to click on the scene
@@ -52,8 +52,8 @@ export default class extends Controller {
 
   setTurnPlayer(player) {
     // update the turn's player
-    this.turn = this.currentUserValue == player ? 'move' : 'defense'
-    this.turnUserValue = player
+    this.turn = this.currentUserIdValue == player ? 'move' : 'defense'
+    this.turnUserIdValue = player
     this.updateStepControls()
     this.updateUserScore()
   }
@@ -78,8 +78,8 @@ export default class extends Controller {
 
     // army update msg
     if (data.army_id) {
-      console.log(this.currentUserValue, data.user_id, this.currentUserValue === data.user_id)
-      const outcome = (this.currentUserValue === data.user_id) ? "You won!" : "You lost!"
+      console.log(this.currentUserIdValue, data.user_id, this.currentUserIdValue === data.user_id)
+      const outcome = (this.currentUserIdValue === data.user_id) ? "You won!" : "You lost!"
       console.log(outcome, this.winnerTarget.firstElementChild);
       this.winnerTarget.firstElementChild.innerText = outcome;
       this.winnerTarget.classList.add('d-flex');
@@ -135,15 +135,17 @@ export default class extends Controller {
     console.log("fight action")
     this.nextTurn()
     // fight cinematic happenning
-    this.nextTurn()
-    // got to next turn
+    setTimeout(() => {
+      this.nextTurn()
+      // got to next turn
+    }, 1000);
   }
 
   updateUserScore() {
     // highlights the player score card of the current turn's player
     this.scoreTargets.forEach((scoreTarget) => {
-      console.log(scoreTarget.dataset.user, this.turnUserValue, scoreTarget.dataset.user == this.turnUserValue)
-      if (scoreTarget.dataset.user == this.turnUserValue) {
+      console.log(scoreTarget.dataset.user, this.turnUserIdValue, scoreTarget.dataset.user == this.turnUserIdValue)
+      if (scoreTarget.dataset.user == this.turnUserIdValue) {
         scoreTarget.classList.add('player-turn')
       } else {
         scoreTarget.classList.remove('player-turn')
