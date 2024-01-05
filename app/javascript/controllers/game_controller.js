@@ -112,23 +112,14 @@ export default class extends Controller {
 
   // move to next step
   nextStep() {
-    console.log(this.stepControls)
+    // console.log(this.stepControls)
     const steps = Object.keys(this.stepControls)
     const currentStepIndex = steps.indexOf(this.step)
     const nextStep = currentStepIndex < steps.length - 1 ? currentStepIndex + 1 : 0
     this.step = steps[nextStep]
     console.log("next turn", this.step)
-    switch (this.step) {
-      case 'defense':
-        this.endTurn()
-        break;
-      case 'fightCinematic':
-        this.hideAllStepControls()
-        break;
-      default:
-        this.updateStepControls()
-        break;
-    }
+    // trigger actions related to each step
+    this.stepAction()
   }
 
   // move to previous step
@@ -141,18 +132,20 @@ export default class extends Controller {
     this.updateStepControls()
   }
 
+  // triggered when press the fight button
   fight() {
     console.log("fight action")
+    // enter in fight cinematic step
     this.nextStep()
-    // fight cinematic happenning
     setTimeout(() => {
+      // got to next step (defense) after a second 
+      // TODO: change timeout to actual cinematic
       this.nextStep()
-      // got to next turn
-    }, 1000);
+    }, 1000)
   }
 
+  // highlights the player score card of the current turn's player
   updateTurnUserInScore() {
-    // highlights the player score card of the current turn's player
     this.scoreTargets.forEach((scoreTarget) => {
       console.log(scoreTarget.dataset.user, this.turnUserIdValue, scoreTarget.dataset.user == this.turnUserIdValue)
       if (scoreTarget.dataset.user == this.turnUserIdValue) {
@@ -163,19 +156,34 @@ export default class extends Controller {
     })
   }
 
+  // run the action related to the current step
+  stepAction() {
+    switch (this.step) {
+      case 'defense': // if next step is defense, stop turn for player
+        this.endTurn()
+        break;
+      case 'fightCinematic': // if next step is fight cinematic, hide all controls
+        this.hideAllStepControls()
+        break;
+      default: // for any other step, display/hide the related controls
+        this.updateStepControls()
+        break;
+    }
+  }
+
+  // display the step controls relative to the current step
   updateStepControls() {
-    // display the step controls relative to the current turn
     Object.values(this.stepControls).forEach(stepTarget => stepTarget?.classList.remove("active"))
     this.stepControls[this.step].classList.add("active")
   }
 
+  // hide all the step controls
   hideAllStepControls() {
-    // hod all the step controls
     Object.values(this.stepControls).forEach(stepTarget => stepTarget?.classList.remove("active"))
   }
 
+  // open/close the setting menu
   openSetting() {
-    // open/close the setting menu
     this.settingMenuTarget.classList.toggle("active")
   }
 }
