@@ -277,7 +277,7 @@ export default class ArScene {
     }
   }
 
-  onSelect(event) {
+  onSelect = (event) => {
     console.log(this.gameController.turn)
     // if defense mode no selection possible
     if (this.gameController.turn == "defense") {

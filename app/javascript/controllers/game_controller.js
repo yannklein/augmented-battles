@@ -7,25 +7,36 @@ import ArScene from "../models/arScene"
 // Connects to data-controller="game"
 export default class extends Controller {
   static values = {
-    armies: Object,
-    currentUserId: Number,
-    turnUserId: Number,
-    gameId: Number
+    armies: Object, // all data about 2 armies fighting
+    currentUserId: Number, // ID of the logged in user
+    turnUserId: Number, // ID of the user of the current turn
+    gameId: Number // game ID
   }
-  static targets = ['move', 'attack', 'defense', 'fight', 'settingMenu', 'score', 'fist', 'winner']
+
+  static targets = [
+    'move',         // "Your turn!" label and "continue to attack" button
+    'attack',       // "Time to attack!" label
+    'defense',      // "Defense time" label
+    'fight',        // "Fight ⚡️" button, asking user to move soldiers
+    'settingMenu',  // bottom right setting menu
+    'score',        // top left/right score boxes
+    'fist',         // all fists of the score boxes (both players)
+    'winner'        // winner/loser modal
+  ]
 
   connect() { 
     // initialize AR vs Demo (non-AR) mode
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     this.mode = urlParams.get('mode');
-    // initialize turn targets
+
+    // initialize turn targets and step matching
     this.stepControls = {
-      move: this.moveTarget, 
-      attack: this.attackTarget, 
-      fight: this.fightTarget,
-      fightCinematic: null,
-      defense: this.defenseTarget
+      move: this.moveTarget,      // user can move soldiers
+      attack: this.attackTarget,  // user can select soldier to attack
+      fight: this.fightTarget,    // user can attack soldier
+      fightCinematic: null,       // attack cinematic step
+      defense: this.defenseTarget // defense step, no action possible until next play turn is over
     }
     
     // define initial turn
@@ -39,29 +50,27 @@ export default class extends Controller {
     )
 
     // initialize the AR scene
-      if (this.mode === "demo") {
-        this.arScene = new DemoScene(this.element, this.armiesValue, this.currentUserIdValue, this)
-      }
-      else {
-        this.arScene = new ArScene(this.element, this.armiesValue, this.currentUserIdValue, this)
-      }
+    const SceneType = (this.mode === "demo") ? DemoScene : ArScene;
+    this.arScene = new SceneType(this.element, this.armiesValue, this.currentUserIdValue, this)
 
-    // Listen to click on the scene
-    window.addEventListener("click", this.arScene.onSelect.bind(this.arScene))
+    // Listen to any click on the scene triggering the onSelect of the AR scene
+    window.addEventListener("click", this.arScene.onSelect)
   }
 
+  // update the turn's player
   setTurnPlayer(player) {
-    // update the turn's player
+    // set the initial step depending on its your turn (move) or not(defense)
     this.turn = this.currentUserIdValue == player ? 'move' : 'defense'
+    // set the new ID of the user of the current turn
     this.turnUserIdValue = player
     this.updateStepControls()
-    this.updateUserScore()
+    this.updateTurnUserInScore()
   }
 
+  // receive and process websocket data (so far, only who's current player)
   processChannelMsg(data) {
-    // receive and process websocket data (so far, only who's current player)
     console.log(data)
-    // turn message
+    // turn change message
     if (data.turn_user) {
       this.setTurnPlayer(data.turn_user)
     }
@@ -141,7 +150,7 @@ export default class extends Controller {
     }, 1000);
   }
 
-  updateUserScore() {
+  updateTurnUserInScore() {
     // highlights the player score card of the current turn's player
     this.scoreTargets.forEach((scoreTarget) => {
       console.log(scoreTarget.dataset.user, this.turnUserIdValue, scoreTarget.dataset.user == this.turnUserIdValue)
