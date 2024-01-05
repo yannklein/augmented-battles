@@ -2,7 +2,7 @@ class GamesController < ApplicationController
   before_action :set_game, only: [:update, :next_turn, :show, :live, :join]
   def index
     @game = Game.new
-    @games = Game.joins(:armies).where(armies: {user: current_user}).includes(:user, :winner)
+    @games = Game.joins(:armies).where(armies: {user: current_user}).includes(:user)
   end
 
   def create

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_15_125207) do
+ActiveRecord::Schema[7.0].define(version: 2024_01_05_124340) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -27,13 +27,11 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_15_125207) do
   create_table "games", force: :cascade do |t|
     t.boolean "archived"
     t.bigint "user_id", null: false
-    t.bigint "winner_id"
     t.bigint "turn_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["turn_id"], name: "index_games_on_turn_id"
     t.index ["user_id"], name: "index_games_on_user_id"
-    t.index ["winner_id"], name: "index_games_on_winner_id"
   end
 
   create_table "soldiers", force: :cascade do |t|
@@ -66,6 +64,5 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_15_125207) do
   add_foreign_key "armies", "users"
   add_foreign_key "games", "users"
   add_foreign_key "games", "users", column: "turn_id"
-  add_foreign_key "games", "users", column: "winner_id"
   add_foreign_key "soldiers", "armies"
 end
