@@ -3,10 +3,10 @@ import { STLLoader } from "three/examples/jsm/loaders/STLLoader"
 import porcelainImg from "/public/matcap-porcelain-white.jpg"
 
 export default class Soldier {
-  constructor(player, soldier, color, marker, onRenderFcts) {
+  constructor(player, soldierData, color, marker, onRenderFcts) {
     this.selected = false
     this.player = player
-    this.soldier = soldier
+    this.soldierData = soldierData
     this.color = parseInt(color, 16)
     this.marker = marker
     this.onRenderFcts = onRenderFcts
@@ -15,7 +15,7 @@ export default class Soldier {
     this.createSoldier()
 
     // invisible if no more mana
-    if (this.soldier.mana <= 0) {
+    if (this.soldierData.mana <= 0) {
       this.killSoldier()
       return
     }
@@ -54,8 +54,8 @@ export default class Soldier {
   showAttackRange() {
     this.range = new THREE.Mesh(
       new THREE.RingGeometry(
-        this.soldier.max_distance,
-        this.soldier.max_distance + 0.3,
+        this.soldierData.max_distance,
+        this.soldierData.max_distance + 0.3,
         32
       ),
       new THREE.MeshBasicMaterial({
@@ -148,7 +148,7 @@ export default class Soldier {
   createMoveRange() {
     const circleGroup = new THREE.Group()
     const circle = new THREE.Mesh(
-      new THREE.CircleGeometry(this.soldier.speed / 2, 32),
+      new THREE.CircleGeometry(this.soldierData.speed / 2, 32),
       new THREE.MeshBasicMaterial({
         side: THREE.DoubleSide,
         color: this.color,
@@ -197,15 +197,15 @@ export default class Soldier {
   }
 
   updateManaDisplay(mana) {
-    this.soldier.mana = mana
-    if (this.soldier.mana <= 0) {
+    this.soldierData.mana = mana
+    if (this.soldierData.mana <= 0) {
       this.killSoldier()
       return
     }
     const oldText = this.soldierGroup.getObjectByName("text");
     this.soldierGroup.remove(oldText)
     this.text = this.createText(
-      `${this.soldier.name} ${this.soldier.skirmish_power}/${this.soldier.distance_power} ❤️${this.soldier.mana}`,
+      `${this.soldierData.name} ${this.soldierData.skirmish_power}/${this.soldierData.distance_power} ❤️${this.soldierData.mana}`,
       12
       )
     console.log(this.soldier);
@@ -213,11 +213,11 @@ export default class Soldier {
   }
 
   updateMana(value){
-    // callback(this.soldier.mana)
-    const url = `/soldiers/${this.soldier.id}`
+    // callback(this.soldierData.mana)
+    const url = `/soldiers/${this.soldierData.id}`
     console.log(url);
     const token = document.getElementsByName('csrf-token')[0].content
-    let newMana = this.soldier.mana + value
+    let newMana = this.soldierData.mana + value
     newMana = newMana >= 0 ? newMana : 0
     const form = new FormData();
     form.append("soldier[mana]", newMana)
@@ -234,7 +234,7 @@ export default class Soldier {
 
   createSoldier() {
     this.soldierGroup = new THREE.Group()
-    this.soldierGroup.name = this.soldier.name
+    this.soldierGroup.name = this.soldierData.name
 
     this.base = this.createBase()
     this.soldierGroup.add(this.base)
@@ -244,7 +244,7 @@ export default class Soldier {
     })
 
     this.text = this.createText(
-      `${this.soldier.name} ${this.soldier.skirmish_power}/${this.soldier.distance_power} ❤️${this.soldier.mana}`,
+      `${this.soldierData.name} ${this.soldierData.skirmish_power}/${this.soldierData.distance_power} ❤️${this.soldierData.mana}`,
       12
     )
     this.soldierGroup.add(this.text)

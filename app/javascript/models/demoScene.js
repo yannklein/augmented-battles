@@ -13,7 +13,7 @@ export default class DemoScene extends ArScene {
   createStuffs() {
     let markerIndex = 0
     Object.keys(this.armiesInfo).forEach((player, playerIndex) => {
-      this.armiesInfo[player]["army"].forEach((soldier, soldierIndex, soldierArr) => {
+      this.armiesInfo[player]["army"].forEach((soldierData, soldierIndex, soldierArr) => {
         const markerRoot = this.markers[markerIndex]
         markerRoot.position.x = soldierIndex * 4  - (soldierArr.length-1) * 4 / 2
         markerRoot.position.y = 0
@@ -21,7 +21,7 @@ export default class DemoScene extends ArScene {
         this.soldiers.push(
           new Soldier(
             player,
-            soldier,
+            soldierData,
             this.armiesInfo[player]["color"],
             markerRoot,
             this.onRenderFcts

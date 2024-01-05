@@ -25,12 +25,12 @@ export default class ArScene {
   createStuffs() {
     let markerIndex = 0
     Object.keys(this.armiesInfo).forEach((player) => {
-      this.armiesInfo[player]["army"].forEach((soldier) => {
+      this.armiesInfo[player]["army"].forEach((soldierData) => {
         const markerRoot = this.markers[markerIndex]
         this.soldiers.push(
           new Soldier(
             player,
-            soldier,
+            soldierData,
             this.armiesInfo[player]["color"],
             markerRoot,
             this.onRenderFcts
@@ -224,8 +224,8 @@ export default class ArScene {
 
   performAction(soldier) {
     // check actions
-    console.log(this.gameController.turn)
-    switch (this.gameController.turn) {
+    console.log(this.gameController.step)
+    switch (this.gameController.step) {
       case "move":
         console.log("start move action")
         // if current player's soldier, select and move it
@@ -266,21 +266,21 @@ export default class ArScene {
         break
       case "fightCinematic":
         console.log(this.soldierAttacked, this.soldierSelected);
-        const impact = - Math.round(this.soldierSelected.soldier.skirmish_power * Math.random())
+        const impact = - Math.round(this.soldierSelected.soldierData.skirmish_power * Math.random())
         console.log({impact});
         this.soldierAttacked.updateMana(impact)
         // TODO: update mana in backend
         console.log("fightCinematic")
       default:
-        console.log("no action", this.gameController.turn)
+        console.log("no action", this.gameController.step)
         break
     }
   }
 
   onSelect = (event) => {
-    console.log(this.gameController.turn)
+    console.log(this.gameController.step)
     // if defense mode no selection possible
-    if (this.gameController.turn == "defense") {
+    if (this.gameController.step == "defense") {
       return
     }
 
@@ -317,7 +317,7 @@ export default class ArScene {
   unSelectAll() {
     this.soldiers.forEach((soldier) => soldier.unSelect())
     this.soldierSelected = null
-    if (this.gameController.turn == "fight") {
+    if (this.gameController.step == "fight") {
       this.gameController.setStep("attack")
     }
     console.log("unselect all")

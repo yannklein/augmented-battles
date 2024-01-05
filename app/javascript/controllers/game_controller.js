@@ -74,7 +74,7 @@ export default class extends Controller {
         this.setTurnPlayer(data.turn_user)
         break;
       case "update soldier":
-        const soldier = this.arScene.soldiers.find(sol => sol.soldier.id === data.soldier_id)
+        const soldier = this.arScene.soldiers.find(sol => sol.soldierData.id === data.soldier_id)
         console.log(this.arScene);
         soldier.updateManaDisplay(data.mana)
 
