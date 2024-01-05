@@ -97,21 +97,21 @@ export default class extends Controller {
     }
   }
 
+  // end turn for current turn's player (connected to backend)
   endTurn() {
-    // end turn for current turn's player (connected to backend)
     fetch(`/games/${this.gameIdValue}/next_turn`)
     // unselect any soldier on board
     this.arScene.unSelectAll()
   }
 
+  // set a certain step as current
   setStep(step) {
-    // set a define turn
     this.step = step
     this.updateStepControls()
   }
 
+  // move to next step
   nextStep() {
-    // move to next turn
     console.log(this.stepControls)
     const steps = Object.keys(this.stepControls)
     const currentStepIndex = steps.indexOf(this.step)
@@ -131,8 +131,8 @@ export default class extends Controller {
     }
   }
 
+  // move to previous step
   prevStep() {
-    // move to previous turn
     const steps = Object.keys(this.stepControls)
     const currentTurn = steps.indexOf(this.step)
     const prevStep = currentTurn > 0 ? currentTurn - 1 : currentTurn
