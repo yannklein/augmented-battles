@@ -39,7 +39,7 @@ export default class extends Controller {
       defense: this.defenseTarget // defense step, no action possible until next play turn is over
     }
     
-    // define initial turn
+    // define initial turn's player
     this.setTurnPlayer(this.turnUserIdValue)
 
     // initialize websocket
@@ -59,7 +59,7 @@ export default class extends Controller {
   // update the turn's player
   setTurnPlayer(player) {
     // set the initial step depending on its your turn (move) or not(defense)
-    this.turn = this.currentUserIdValue == player ? 'move' : 'defense'
+    this.step = this.currentUserIdValue == player ? 'move' : 'defense'
     // set the new ID of the user of the current turn
     this.turnUserIdValue = player
     this.updateStepControls()
@@ -104,21 +104,21 @@ export default class extends Controller {
     this.arScene.unSelectAll()
   }
 
-  setTurn(turn) {
+  setStep(step) {
     // set a define turn
-    this.turn = turn
+    this.step = step
     this.updateStepControls()
   }
 
-  nextTurn() {
+  nextStep() {
     // move to next turn
     console.log(this.stepControls)
     const steps = Object.keys(this.stepControls)
-    const currentTurn = steps.indexOf(this.turn)
-    const nextTurn = currentTurn < steps.length - 1 ? currentTurn + 1 : 0
-    this.turn = steps[nextTurn]
-    console.log("next turn", this.turn)
-    switch (this.turn) {
+    const currentStepIndex = steps.indexOf(this.step)
+    const nextStep = currentStepIndex < steps.length - 1 ? currentStepIndex + 1 : 0
+    this.step = steps[nextStep]
+    console.log("next turn", this.step)
+    switch (this.step) {
       case 'defense':
         this.endTurn()
         break;
@@ -131,22 +131,22 @@ export default class extends Controller {
     }
   }
 
-  prevTurn() {
+  prevStep() {
     // move to previous turn
     const steps = Object.keys(this.stepControls)
-    const currentTurn = steps.indexOf(this.turn)
-    const prevTurn = currentTurn > 0 ? currentTurn - 1 : currentTurn
-    this.turn = steps[prevTurn]
-    console.log("prev turn", this.turn)
+    const currentTurn = steps.indexOf(this.step)
+    const prevStep = currentTurn > 0 ? currentTurn - 1 : currentTurn
+    this.step = steps[prevStep]
+    console.log("prev turn", this.step)
     this.updateStepControls()
   }
 
   fight() {
     console.log("fight action")
-    this.nextTurn()
+    this.nextStep()
     // fight cinematic happenning
     setTimeout(() => {
-      this.nextTurn()
+      this.nextStep()
       // got to next turn
     }, 1000);
   }
@@ -166,7 +166,7 @@ export default class extends Controller {
   updateStepControls() {
     // display the step controls relative to the current turn
     Object.values(this.stepControls).forEach(stepTarget => stepTarget?.classList.remove("active"))
-    this.stepControls[this.turn].classList.add("active")
+    this.stepControls[this.step].classList.add("active")
   }
 
   hideAllStepControls() {

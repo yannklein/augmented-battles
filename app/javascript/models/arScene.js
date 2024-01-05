@@ -245,7 +245,7 @@ export default class ArScene {
             sol.unSelect()
             sol.removeAttackArrow()
           })
-          this.gameController.setTurn("attack")
+          this.gameController.setStep("attack")
           soldier.select()
           soldier.showAttackRange()
           this.soldierSelected = soldier
@@ -261,7 +261,7 @@ export default class ArScene {
           this.soldierAttacked = soldier
           this.soldierAttacked.select()
           this.soldierSelected.attack(this.soldierAttacked)
-          this.gameController.setTurn("fight")
+          this.gameController.setStep("fight")
         }
         break
       case "fightCinematic":
@@ -318,7 +318,7 @@ export default class ArScene {
     this.soldiers.forEach((soldier) => soldier.unSelect())
     this.soldierSelected = null
     if (this.gameController.turn == "fight") {
-      this.gameController.setTurn("attack")
+      this.gameController.setStep("attack")
     }
     console.log("unselect all")
   }
