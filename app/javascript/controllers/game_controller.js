@@ -71,28 +71,31 @@ export default class extends Controller {
   processChannelMsg(data) {
     console.log(data)
     // turn change message
-    if (data.turn_user) {
-      this.setTurnPlayer(data.turn_user)
-    }
-    // soldier update msg
-    if (data.soldier_id) {
-      const soldier = this.arScene.soldiers.find(sol => sol.soldier.id === data.soldier_id)
-      console.log(this.arScene);
-      soldier.updateManaDisplay(data.mana)
+    switch (data.type) {
+      case "next turn":
+        this.setTurnPlayer(data.turn_user)
+        break;
+      case "update soldier":
+        const soldier = this.arScene.soldiers.find(sol => sol.soldier.id === data.soldier_id)
+        console.log(this.arScene);
+        soldier.updateManaDisplay(data.mana)
 
-      if (data.mana <= 0) {
-        this.fistTargets.find(fist => fist.id === `life-${data.soldier_id}`).remove();
-      }
-    }
-
-    // army update msg
-    if (data.army_id) {
-      console.log(this.currentUserIdValue, data.user_id, this.currentUserIdValue === data.user_id)
-      const outcome = (this.currentUserIdValue === data.user_id) ? "You won!" : "You lost!"
-      console.log(outcome, this.winnerTarget.firstElementChild);
-      this.winnerTarget.firstElementChild.innerText = outcome;
-      this.winnerTarget.classList.add('d-flex');
-      this.winnerTarget.classList.remove('d-none');
+        if (data.mana <= 0) {
+          this.fistTargets.find(fist => fist.id === `life-${data.soldier_id}`).remove();
+        }
+        break;
+      case "game finished":
+        console.log(this.currentUserIdValue, data.user_id, this.currentUserIdValue === data.user_id)
+        const outcome = (this.currentUserIdValue === data.loser_id) ? "You lost!" : "You won!"
+        console.log(outcome, this.winnerTarget.firstElementChild);
+        this.winnerTarget.firstElementChild.innerText = outcome;
+        this.winnerTarget.classList.add('d-flex');
+        this.winnerTarget.classList.remove('d-none');
+        break;
+    
+      default:
+        console.warn("Unknown cable message");
+        break;
     }
   }
 

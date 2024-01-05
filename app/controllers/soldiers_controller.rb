@@ -6,18 +6,19 @@ class SoldiersController < ApplicationController
     GameChannel.broadcast_to(
       @game,
       {
+        type: "update soldier",
         soldier_id: @soldier.id,
         mana: @soldier.mana
       }.to_json
     )
     if @soldier.army.isDecimated
-      @game.update(winner: @soldier.army.user)
+      # @game.update(winner: @soldier.army.user)
       GameChannel.broadcast_to(
       @game,
       {
+        type: "game finished",
         army_id: @soldier.army.id,
-        user_id: @soldier.army.user.id,
-        status: 'Winner'
+        loser_id: @soldier.army.user.id,
       }.to_json
     )
     end

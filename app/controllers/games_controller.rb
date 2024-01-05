@@ -58,6 +58,7 @@ class GamesController < ApplicationController
     GameChannel.broadcast_to(
       @game,
       {
+        type: "next turn",
         game_id: @game.id,
         turn_user: next_player.id
       }.to_json
