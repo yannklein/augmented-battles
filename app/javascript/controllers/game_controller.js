@@ -40,8 +40,7 @@ export default class extends Controller {
     }
     
     // define initial turn
-    this.turn = this.turnUserIdValue
-    this.setTurnPlayer(this.turn)
+    this.setTurnPlayer(this.turnUserIdValue)
 
     // initialize websocket
     this.channel = createConsumer().subscriptions.create(
@@ -70,7 +69,6 @@ export default class extends Controller {
   // receive and process websocket data (so far, only who's current player)
   processChannelMsg(data) {
     console.log(data)
-    // turn change message
     switch (data.type) {
       case "next turn":
         this.setTurnPlayer(data.turn_user)
@@ -100,9 +98,9 @@ export default class extends Controller {
   }
 
   endTurn() {
-    // end turn for current player (connected to backend)
-    const url = `/games/${this.gameIdValue}/next_turn`
-    fetch(url)
+    // end turn for current turn's player (connected to backend)
+    fetch(`/games/${this.gameIdValue}/next_turn`)
+    // unselect any soldier on board
     this.arScene.unSelectAll()
   }
 
