@@ -271,12 +271,11 @@ export default class ArScene {
         }
         break
       case "fightCinematic":
+        console.log("fightCinematic")
         console.log(this.soldierAttacked, this.soldierSelected);
         const impact = - Math.round(this.soldierSelected.soldierData.skirmish_power * Math.random())
         console.log({impact});
         this.soldierAttacked.updateMana(impact)
-        // TODO: update mana in backend
-        console.log("fightCinematic")
       default:
         console.log("no action", this.gameController.step)
         break
