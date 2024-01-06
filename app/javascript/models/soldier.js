@@ -3,9 +3,9 @@ import { STLLoader } from "three/examples/jsm/loaders/STLLoader"
 import porcelainImg from "/public/matcap-porcelain-white.jpg"
 
 export default class Soldier {
-  constructor(player, soldierData, color, marker, onRenderFcts) {
+  constructor(id, soldierData, color, marker, onRenderFcts) {
     this.selected = false
-    this.player = player
+    this.id = id
     this.soldierData = soldierData
     this.color = parseInt(color, 16)
     this.marker = marker

@@ -6,23 +6,23 @@ import ArScene from "./arScene";
 
 
 export default class DemoScene extends ArScene {
-  constructor(container, armiesInfo, currentUser, gameController) {
-    super(container, armiesInfo, currentUser, gameController)
+  constructor(container, armiesInfo, currentUserId, gameController) {
+    super(container, armiesInfo, currentUserId, gameController)
   }
 
   createStuffs() {
     let markerIndex = 0
-    Object.keys(this.armiesInfo).forEach((player, playerIndex) => {
-      this.armiesInfo[player]["army"].forEach((soldierData, soldierIndex, soldierArr) => {
+    Object.keys(this.armiesInfo).forEach((playerId, playerIndex) => {
+      this.armiesInfo[playerId]["army"].forEach((soldierData, soldierIndex, soldierArr) => {
         const markerRoot = this.markers[markerIndex]
         markerRoot.position.x = soldierIndex * 4  - (soldierArr.length-1) * 4 / 2
         markerRoot.position.y = 0
         markerRoot.position.z = playerIndex * 4 - 2
         this.soldiers.push(
           new Soldier(
-            player,
+            playerId,
             soldierData,
-            this.armiesInfo[player]["color"],
+            this.armiesInfo[playerId]["color"],
             markerRoot,
             this.onRenderFcts
           )

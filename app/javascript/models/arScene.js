@@ -5,33 +5,36 @@ import Soldier from "../models/soldier"
 THREEx.ArToolkitContext.baseURL = "/"
 
 export default class ArScene {
-  constructor(container, armiesInfo, currentUser, gameController) {
+  constructor(container, armiesInfo, currentUserId, gameController) {
     this.imageMarkerFolder = "/characters/markers/"
+    // markers responsible for the soldier 3d model selection and the amount of soldiers
+    // TODO: to be adapted/scaled for more soldiers
     this.imageMarkers = ["m1", "m2", "m3", "m4", "m5", "m6"]
     
-    this.container = container
-    this.armiesInfo = armiesInfo
-    this.currentUser = currentUser
-    this.gameController = gameController
+    this.container = container            // div containing the whole game
+    this.armiesInfo = armiesInfo          // object with both armies/soldiers info
+    this.currentUserId = currentUserId    // ID of the current user
+    this.gameController = gameController  // game Stimulus controller
     
-    this.soldiers = []
-    this.soldierSelected = null
-    this.soldierAttacked = null
-    this.markers = []
+    this.soldiers = []           // array of soldiers of the game
+    this.soldierSelected = null  // selected soldier (instance of Soldier)
+    this.soldierAttacked = null  // attacked soldier (instance of Soldier)
+    this.markers = []            // array of the AR markers connected to each soldier
     
-    this.initScene()
+    this.initScene() // initialize AR scene with game board and soldiers
   }
 
+  // create object on the AR scene
   createStuffs() {
     let markerIndex = 0
-    Object.keys(this.armiesInfo).forEach((player) => {
-      this.armiesInfo[player]["army"].forEach((soldierData) => {
+    Object.keys(this.armiesInfo).forEach((playerId) => {
+      this.armiesInfo[playerId]["army"].forEach((soldierData) => {
         const markerRoot = this.markers[markerIndex]
         this.soldiers.push(
           new Soldier(
-            player,
+            playerId,
             soldierData,
-            this.armiesInfo[player]["color"],
+            this.armiesInfo[playerId]["color"],
             markerRoot,
             this.onRenderFcts
           )
@@ -41,6 +44,7 @@ export default class ArScene {
     })
   }
 
+  // initialize AR scene and game/soldiers
   initScene() {
     // init renderer
     this.renderer = new THREE.WebGLRenderer({
@@ -138,6 +142,7 @@ export default class ArScene {
       arToolkitContext.update(arToolkitSource.domElement)
     })
 
+    // create soldiers on the board
     this.createStuffs()
 
     //////////////////////////////////////////////////////////////////////////////////
@@ -222,6 +227,7 @@ export default class ArScene {
     return arToolkitContext
   }
 
+  // perform the current step action related to a clicked soldier
   performAction(soldier) {
     // check actions
     console.log(this.gameController.step)
@@ -229,7 +235,7 @@ export default class ArScene {
       case "move":
         console.log("start move action")
         // if current player's soldier, select and move it
-        if (soldier.player == this.currentUser) {
+        if (soldier.id == this.currentUserId) {
           this.unSelectAll()
           soldier.select()
           soldier.showMoveRange()
@@ -240,7 +246,7 @@ export default class ArScene {
       case "fight":
         console.log("start attack action")
         // if current player's soldier, select it
-        if (soldier.player == this.currentUser) {
+        if (soldier.id == this.currentUserId) {
           this.soldiers.forEach((sol) => {
             sol.unSelect()
             sol.removeAttackArrow()
