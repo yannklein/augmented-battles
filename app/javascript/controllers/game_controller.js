@@ -50,7 +50,12 @@ export default class extends Controller {
 
     // initialize the AR scene
     const SceneType = (this.mode === "demo") ? DemoScene : ArScene;
-    this.arScene = new SceneType(this.element, this.armiesValue, this.currentUserIdValue, this)
+    this.arScene = new SceneType(
+      this.element, 
+      this.armiesValue, 
+      this.currentUserIdValue, 
+      this
+    )
 
     // Listen to any click on the scene triggering the onSelect of the AR scene
     window.addEventListener("click", this.arScene.onSelect)
@@ -118,8 +123,8 @@ export default class extends Controller {
     const nextStep = currentStepIndex < steps.length - 1 ? currentStepIndex + 1 : 0
     this.step = steps[nextStep]
     console.log("next turn", this.step)
-    // trigger actions related to each step
-    this.stepAction()
+    // update controls according to each step
+    this.updateControls()
   }
 
   // move to previous step
@@ -156,8 +161,8 @@ export default class extends Controller {
     })
   }
 
-  // run the action related to the current step
-  stepAction() {
+  // update controls according to each step
+  updateControls() {
     switch (this.step) {
       case 'defense': // if next step is defense, stop turn for player
         this.endTurn()
