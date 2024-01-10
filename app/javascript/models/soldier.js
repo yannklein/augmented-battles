@@ -145,6 +145,49 @@ export default class Soldier {
     return plane
   }
 
+  createManaBalls() {
+    const group = new THREE.Group()
+    group.name = 'mana-balls'
+    const ballAmount = this.soldierData.mana
+
+    for (let i=0; i < ballAmount; i++) {
+      const geometry = new THREE.TetrahedronGeometry(0.2, 0)
+      const material = new THREE.MeshLambertMaterial({color: 0xC56CEF})
+
+      const ball = new THREE.Mesh(geometry, material)
+      ball.marker = this.marker
+      ball.soldier = this
+
+      
+      group.add(ball)
+    }
+
+    // Trigonometry Constants for Orbital Paths 
+    let theta = 0; // Current angle
+    // Angle increment on each render
+    const dTheta = 2 * Math.PI / 300;
+
+    this.onRenderFcts.push(() => {
+      //Increment theta, and update sphere coords based off new value        
+      theta += dTheta;
+      // Store trig functions for sphere orbits 
+      // MUST BE INSIDE RENDERING FUNCTION OR THETA VALUES ONLY GET SET ONCE
+      const radius = 0.7
+      const trigs = [
+          {x: Math.cos(theta*1.05), y: Math.sin(theta*1.05), z: Math.cos(theta*1.05), r: radius},
+          {x: Math.cos(theta*0.8), y: Math.sin(theta*0.8), z: Math.sin(theta*0.8), r: radius},
+          {x: Math.cos(theta*1.25), y: Math.cos(theta*1.25), z: Math.sin(theta*1.25), r: radius},
+          {x: Math.sin(theta*0.6), y: Math.cos(theta*0.6), z: Math.sin(theta*0), r: radius}
+      ];
+      group.children.forEach((ball, i) => {
+        ball.position.x = trigs[i]['r'] * trigs[i]['x'];
+        ball.position.y = trigs[i]['r'] * trigs[i]['y'];
+        ball.position.z = trigs[i]['r'] * trigs[i]['z'] + 1;
+      })
+    })
+    return group
+  }
+
   createMoveRange() {
     const circleGroup = new THREE.Group()
     const circle = new THREE.Mesh(
@@ -196,20 +239,27 @@ export default class Soldier {
     // this.marker.parent.removeFromParent()
   }
 
-  updateManaDisplay(mana) {
-    this.soldierData.mana = mana
+  updateManaDisplay() {
+    // hide the solidier if killed
     if (this.soldierData.mana <= 0) {
       this.killSoldier()
-      return
-    }
+    } 
+    // update text
     const oldText = this.soldierGroup.getObjectByName("text");
     this.soldierGroup.remove(oldText)
     this.text = this.createText(
       `${this.soldierData.name} ${this.soldierData.skirmish_power}/${this.soldierData.distance_power} ❤️${this.soldierData.mana}`,
       12
       )
-    console.log(this.soldier);
+    console.log(this.soldierData);
     this.soldierGroup.add(this.text)
+
+    // update balls
+    // remove current mana balls
+    this.soldierGroup.remove(this.manaBalls)
+    // recreate with the right mana balls amount
+    this.manaBalls = this.createManaBalls()
+    this.soldierGroup.add(this.manaBalls)
   }
 
   updateMana(value){
@@ -227,8 +277,9 @@ export default class Soldier {
       body: form
     })
       .then(r => r.json())
-      .then((soldierData) => {
-        this.updateManaDisplay(soldierData.mana)
+      .then((data) => {
+        this.soldierData.mana = data.mana
+        this.updateManaDisplay()
     })
   }
 
@@ -238,6 +289,9 @@ export default class Soldier {
 
     this.base = this.createBase()
     this.soldierGroup.add(this.base)
+
+    this.manaBalls = this.createManaBalls()
+    this.soldierGroup.add(this.manaBalls)
 
     this.createAsset((asset) => {
       this.soldierGroup.add(asset)

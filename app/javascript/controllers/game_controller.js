@@ -80,9 +80,10 @@ export default class extends Controller {
         break;
       case "update soldier":
         const soldier = this.arScene.soldiers.find(sol => sol.soldierData.id === data.soldier_id)
-        console.log(this.arScene);
-        soldier.updateManaDisplay(data.mana)
-
+        soldier.soldierData.mana = data.mana
+        soldier.updateManaDisplay()
+        
+        // remove a fist if the soldier is killed
         if (data.mana <= 0) {
           this.fistTargets.find(fist => fist.id === `life-${data.soldier_id}`).remove();
         }
