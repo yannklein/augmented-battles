@@ -174,15 +174,15 @@ export default class Soldier {
       // MUST BE INSIDE RENDERING FUNCTION OR THETA VALUES ONLY GET SET ONCE
       const radius = 0.7
       const trigs = [
-          {x: Math.cos(theta*1.05), y: Math.sin(theta*1.05), z: Math.cos(theta*1.05), r: radius},
-          {x: Math.cos(theta*0.8), y: Math.sin(theta*0.8), z: Math.sin(theta*0.8), r: radius},
-          {x: Math.cos(theta*1.25), y: Math.cos(theta*1.25), z: Math.sin(theta*1.25), r: radius},
-          {x: Math.sin(theta*0.6), y: Math.cos(theta*0.6), z: Math.sin(theta*0), r: radius}
+          {x: Math.cos(theta*1.05), y: Math.sin(theta*1.05), z: Math.cos(theta*1.05)},
+          {x: Math.cos(theta*0.8), y: Math.sin(theta*0.8), z: Math.sin(theta*0.8)},
+          {x: Math.cos(theta*1.25), y: Math.cos(theta*1.25), z: Math.sin(theta*1.25)},
+          {x: Math.sin(theta*0.6), y: Math.cos(theta*0.6), z: Math.sin(theta*0)}
       ];
       group.children.forEach((ball, i) => {
-        ball.position.x = trigs[i]['r'] * trigs[i]['x'];
-        ball.position.y = trigs[i]['r'] * trigs[i]['y'];
-        ball.position.z = trigs[i]['r'] * trigs[i]['z'] + 1;
+        ball.position.x = radius * trigs[i]['x'];
+        ball.position.y = radius * trigs[i]['y'];
+        ball.position.z = radius * trigs[i]['z'] + 1;
       })
     })
     return group
